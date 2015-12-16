@@ -3,26 +3,11 @@ from playhouse.postgres_ext import *
 
 database = PostgresqlExtDatabase('elex', **{'user': 'elex'})
 
-class UnknownField(object):
-    pass
 
 class BaseModel(Model):
     class Meta:
         database = database
 
-class BallotPosition(BaseModel):
-    ballotorder = IntegerField(null=True)
-    candidateid = CharField(null=True)
-    description = CharField(null=True)
-    id = CharField(null=True)
-    last = CharField(null=True)
-    polid = CharField(null=True)
-    polnum = CharField(null=True)
-    seatname = CharField(null=True)
-    unique = CharField(db_column='unique_id', null=True)
-
-    class Meta:
-        db_table = 'ballot_positions'
 
 class ElexCandidate(BaseModel):
     candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
@@ -47,24 +32,6 @@ class ElexCandidate(BaseModel):
             return self.nyt_candidate_name
         return "%s %s" % (self.first, self.last)
 
-class OverrideCandidate(BaseModel):
-    candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
-    nyt_candidate_description = CharField(null=True)
-    nyt_candidate_name = CharField(null=True)
-    nyt_races = ArrayField(field_class=IntegerField)
-
-    class Meta:
-        db_table = 'override_candidates'
-
-class OverrideRace(BaseModel):
-    accept_ap_calls = BooleanField(null=True)
-    nyt_race_description = CharField(null=True)
-    nyt_race_name = CharField(null=True)
-    nyt_winner = BooleanField(null=True)
-    race_raceid = CharField(primary_key=True)
-
-    class Meta:
-        db_table = 'override_races'
 
 class ElexRace(BaseModel):
     accept_ap_calls = BooleanField(null=True)
@@ -111,34 +78,6 @@ class ElexRace(BaseModel):
     def candidates(self):
         return None
 
-class ReportingUnit(BaseModel):
-    description = CharField(null=True)
-    fipscode = CharField(null=True)
-    id = CharField(null=True)
-    initialization_data = BooleanField(null=True)
-    lastupdated = DateField(null=True)
-    level = CharField(null=True)
-    national = CharField(null=True)
-    officeid = CharField(null=True)
-    officename = CharField(null=True)
-    precinctsreporting = IntegerField(null=True)
-    precinctsreportingpct = DecimalField(null=True)
-    precinctstotal = IntegerField(null=True)
-    raceid = CharField(null=True)
-    racetype = CharField(null=True)
-    racetypeid = CharField(null=True)
-    reportingunitid = CharField(null=True)
-    reportingunitname = CharField(null=True)
-    seatname = CharField(null=True)
-    seatnum = CharField(null=True)
-    statename = CharField(null=True)
-    statepostal = CharField(null=True)
-    test = BooleanField(null=True)
-    uncontested = BooleanField(null=True)
-    votecount = IntegerField(null=True)
-
-    class Meta:
-        db_table = 'reporting_units'
 
 class ElexResult(BaseModel):
     candidate_candidateid = CharField(db_column='candidate_candidateid')
