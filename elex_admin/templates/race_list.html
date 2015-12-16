@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Races</h2>
+<table class="table">
+<tr>
+    <th>State</th>
+    <th>Party</th>
+    <th>Office</th>
+    <th>Type</th>
+</tr>
+{% for race in races %}
+<tr>
+    <td><a href="/elex/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
+    <td>{{ race.party }}</td>
+    <td>{{ race.officename }}</td>
+    <td>{{ race.racetype }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
