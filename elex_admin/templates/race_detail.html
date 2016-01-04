@@ -10,7 +10,7 @@
         <h3>Accept AP calls</h3>
     </div>
     <div class="col-md-1">
-        <input type="checkbox" {% if race.accept_ap_calls %}checked {% endif%}data-toggle="toggle" data-onstyle="success">
+        <input id="race-{{ race.raceid }}" class="race-ap-toggle" data-raceid="{{ race.raceid }}" type="checkbox" {% if race.accept_ap_calls %}checked {% endif%}data-toggle="toggle" data-onstyle="success">
     </div>
 </div>
 
@@ -20,15 +20,15 @@
 <h3>Candidates</h3>
 <table class="table">
     <tr>
-        <th>NYT Name</th>
-        <th>NYT Description</th>
-        <th></th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Important</th>
     </tr>
 {% for c in candidates %}
     <tr id="candidate-{{ c.candidateid }}">
-        <td><input class="form-control candidate-name" name="nyt_candidate_name" value="{{ c }}"></td>
-        <td><input class="form-control candidate-description" name="nyt_candidate_description" value="{% if nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}"></td>
-        <td><input type="button" class="btn btn-small btn-success" value="Save" data-candidateid="{{ c.candidateid }}"></td>
+        <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-name" name="nyt_candidate_name" value="{{ c }}"></td>
+        <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-description" name="nyt_candidate_description" value="{% if nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}"></td>
+        <td><input data-candidateid="{{ c.candidateid }}" type="checkbox" class="form-control candidate-important" name="nyt_candidate_important" {% if c.nyt_candidate_important %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
     </tr>
 {% endfor %}
 </table>
@@ -38,22 +38,36 @@
 
 {% block extrajs %}
 <script type="text/javascript">
-    var submit_candidate = function(data){
-        var candidate_id = $(this).attr('data-candidateid');
-        var data = {}
-        data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
-        data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' input.candidate-description').val();
+    var submit_race = function(data){
+        var race_id = $(this).attr('data-raceid');
+        var data = {};
+        data['accept_ap_calls'] = $('#race-' + race_id).prop('checked');
         $.ajax({
-          type: "POST",
-          url: '/elex/candidate/' + candidate_id + '/',
-          data: data,
-          success: function(response){
-            console.log(response);
-          },
-          dataType: 'JSON'
+            type: "POST",
+            url: '/elex/race/' + race_id + '/',
+            data: data,
+            success: function(response){ console.log(response); },
+            dataType: 'JSON'
         });
     };
 
-    $('input.btn').on('click', submit_candidate);
+    var submit_candidate = function(data){
+        var candidate_id = $(this).attr('data-candidateid');
+        var data = {};
+        data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
+        data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' input.candidate-description').val();
+        data['nyt_candidate_important'] = $('#candidate-' + candidate_id + ' input.candidate-important').prop('checked');
+        $.ajax({
+            type: "POST",
+            url: '/elex/candidate/' + candidate_id + '/',
+            data: data,
+            success: function(response){ console.log(response); },
+            dataType: 'JSON'
+        });
+    };
+
+    $('input.form-control').on('blur', submit_candidate);
+    $('input.candidate-important').on('change', submit_candidate)
+    $('input.race-ap-toggle').on('change', submit_race);
 </script>
 {% endblock %}
