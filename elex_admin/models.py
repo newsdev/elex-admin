@@ -24,17 +24,13 @@ class OverrideCandidate(BaseModel):
     @classmethod
     def add_candidates(cls):
         races = ElexRace.select()
-
         for race in list(races):
-
             candidates = list(race.state())
-
             for candidate in candidates:
                 try:
                     oc = cls.get(cls.candidate_candidateid == candidate.candidateid)
                 except cls.DoesNotExist:
                     oc = cls.create(candidate_candidateid=candidate.candidateid)
-
                 oc.nyt_races = [int(race.raceid)]
                 oc.save()
                 print oc.candidate_candidateid
@@ -47,7 +43,7 @@ class OverrideRace(BaseModel):
     accept_ap_calls = BooleanField(null=True)
     nyt_race_description = CharField(null=True)
     nyt_race_name = CharField(null=True)
-    nyt_winner = BooleanField(null=True)
+    nyt_winner = CharField(null=True)
     race_raceid = CharField(primary_key=True)
     nyt_race_important = BooleanField(null=True)
 
@@ -84,7 +80,7 @@ class ElexRace(BaseModel):
     accept_ap_calls = BooleanField(null=True)
     nyt_race_description = CharField(null=True)
     nyt_race_name = CharField(null=True)
-    nyt_winner = BooleanField(null=True)
+    nyt_winner = CharField(null=True)
     race_raceid = CharField(primary_key=True)
     description = CharField(null=True)
     id = CharField(null=True)

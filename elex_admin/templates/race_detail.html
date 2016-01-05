@@ -33,10 +33,10 @@
                 <td><strong>Winner</strong></td>
                 <td>
                     <select{% if race.accept_ap_calls %} disabled{% endif %} class="form-control nyt_winner" name="nyt_winner" data-raceid="{{ race.raceid }}">
-                        <option value=""></option>
                         {% for c in candidates %}
-                         <option value="{{ c.candidateid }}">{{ c }}</option>
+                         <option{% if race.nyt_winner == c.candidateid %} selected{% endif %} value="{{ c.candidateid }}">{{ c }}</option>
                         {% endfor %}
+                        <option{% if not race.nyt_winner %} selected{% endif %} value=""></option>
                     </select>
                 </td>
             </tr>
@@ -70,9 +70,15 @@
 
 {% block extrajs %}
 <script type="text/javascript">
-    var update_race_text = function(data){
+    var update_race_text = function(data, race_id){
         $('#target-nyt_race_description').text(data['nyt_race_description']);
         $('#target-nyt_race_name').text(data['nyt_race_name']);
+        var winner = data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
+        if (winner) {
+            $('#race-' + race_id + ' select.nyt_winner').prop('disabled', true);
+        } else {
+            $('#race-' + race_id + ' select.nyt_winner').prop('disabled', false);
+        }
     };
 
     var submit_race = function(data){
@@ -88,7 +94,7 @@
             type: "POST",
             url: '/elex/race/' + race_id + '/',
             data: data,
-            success: function(response){ update_race_text(data); },
+            success: function(response){ update_race_text(data,race_id); },
             dataType: 'JSON'
         });
     };
@@ -113,6 +119,7 @@
     $('table.races input.form-control').on('blur', submit_race);
     $('table.candidates input.form-control').on('blur', submit_candidate);
     $('input.candidate-important').on('change', submit_candidate)
+    $('select.nyt_winner').on('change', submit_race);
     $('input.race-ap-toggle').on('change', submit_race);
 </script>
 {% endblock %}

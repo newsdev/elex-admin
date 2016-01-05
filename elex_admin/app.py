@@ -13,6 +13,30 @@ import utils
 
 app = Flask(__name__)
 
+def update_views():
+    models.database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
+    models.database.execute_sql(utils.ELEX_RACE_VIEW_COMMAND)
+    models.database.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
+
+def clean_payload(payload):
+    for k,v in payload.items():
+        v = v[0]
+        if v == u'':
+            v = None
+        if v == 'true':
+            v = True
+        if v == 'false':
+            v = False
+        payload[k] = v
+    return payload
+
+def update_model(cls, payload):
+    for k,v in payload.items():
+        setattr(cls,k,v)
+    cls.save()
+
+def set_winner(candidateid, raceid):
+    print candidateid, raceid
 
 def build_context():
     context = {}
@@ -35,53 +59,34 @@ def race_detail(raceid):
         return render_template('race_detail.html', **context)
 
     if request.method == 'POST':
-        payload = dict(request.form)
-
+        payload = clean_payload(dict(request.form))
         try:
             r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid)
         except models.OverrideRace.DoesNotExist:
             r = models.OverrideRace.create(race_raceid=raceid)
 
-        for k,v in payload.items():
-            v = v[0]
-            if v == u'':
-                v = None
-            if v == 'true':
-                v = True
-            if v == 'false':
-                v = False
-            setattr(r,k,v)
+        if payload.get('nyt_winner', None):
+            set_winner(payload['nyt_winner'], raceid)
 
-        r.save()
+        update_model(r, payload)
+        update_views()
 
-        models.database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
-        models.database.execute_sql(utils.ELEX_RACE_VIEW_COMMAND)
-        return json.dumps({"result": "success"})
+        return json.dumps({"message": "success"})
 
 @app.route('/elex/candidate/<candidateid>/', methods=['POST'])
 def candidate_detail(candidateid):
     if request.method == 'POST':
-        payload = dict(request.form)
+        payload = clean_payload(dict(request.form))
+
         try:
             oc = models.OverrideCandidate.get(models.OverrideCandidate.candidate_candidateid == candidateid)
         except models.OverrideCandidate.DoesNotExist:
             oc = models.OverrideCandidate.create(candidate_candidateid=candidateid)
 
-        for k,v in payload.items():
-            v = v[0]
-            if v == u'':
-                v = None
-            if v == 'true':
-                v = True
-            if v == 'false':
-                v = False
-            setattr(oc,k,v)
+        update_model(oc, payload)
+        update_views()
 
-        oc.save()
-
-        models.database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
-        models.database.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
-        return json.dumps({"result": "success"})
+        return json.dumps({"message": "success"})
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
