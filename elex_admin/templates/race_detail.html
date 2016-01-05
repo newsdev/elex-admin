@@ -6,18 +6,16 @@
     <div class="col-md-12">
         <h1>
             {{ RACEDATE }}
-            <small>{% if race.nyt_race_name %}{{ race.nyt_race_name }}{% else %}{{ race }}{% endif %}</small>
+            <small id="target-nyt_race_name">{% if race.nyt_race_name %}{{ race.nyt_race_name }}{% else %}{{ race }}{% endif %}</small>
         </h1>
     </div>
 </div>
 
-{% if race.nyt_race_description %}
 <div class="row" style="margin:15px 0;">
     <div class="col-md-12">
-        <p style="font-size: 24px;">{{ race.nyt_race_description }}</p>
+        <p id="target-nyt_race_description" style="font-size: 24px;">{% if race.nyt_race_description %}{{ race.nyt_race_description }}{% else %}{% endif %}</p>
     </div>
 </div>
-{% endif %}
 
 <div class="row">
     <div class="col-md-12">
@@ -72,6 +70,11 @@
 
 {% block extrajs %}
 <script type="text/javascript">
+    var update_race_text = function(data){
+        $('#target-nyt_race_description').text(data['nyt_race_description']);
+        $('#target-nyt_race_name').text(data['nyt_race_name']);
+    };
+
     var submit_race = function(data){
         var race_id = $(this).attr('data-raceid');
         var data = {};
@@ -85,7 +88,7 @@
             type: "POST",
             url: '/elex/race/' + race_id + '/',
             data: data,
-            success: function(response){ console.log(response); },
+            success: function(response){ update_race_text(data); },
             dataType: 'JSON'
         });
     };
