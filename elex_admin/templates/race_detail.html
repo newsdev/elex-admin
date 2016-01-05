@@ -1,38 +1,72 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ race }}</h1>
-
-<hr>
 
 <div class="row">
-    <div class="col-md-3">
-        <h3>Accept AP calls</h3>
-    </div>
-    <div class="col-md-1">
-        <input id="race-{{ race.raceid }}" class="race-ap-toggle" data-raceid="{{ race.raceid }}" type="checkbox" {% if race.accept_ap_calls %}checked {% endif%}data-toggle="toggle" data-onstyle="success">
+    <div class="col-md-12">
+        <h1>
+            {{ RACEDATE }}
+            <small>{% if race.nyt_race_name %}{{ race.nyt_race_name }}{% else %}{{ race }}{% endif %}</small>
+        </h1>
     </div>
 </div>
 
-<hr>
-
-{% if candidates %}
-<h3>Candidates</h3>
-<table class="table">
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Display?</th>
-    </tr>
-{% for c in candidates %}
-    <tr id="candidate-{{ c.candidateid }}">
-        <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-name" name="nyt_candidate_name" value="{{ c }}"></td>
-        <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-description" name="nyt_candidate_description" value="{% if nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}"></td>
-        <td><input data-candidateid="{{ c.candidateid }}" type="checkbox" class="form-control candidate-important" name="nyt_candidate_important" {% if c.nyt_candidate_important %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
-    </tr>
-{% endfor %}
-</table>
+{% if race.nyt_race_description %}
+<div class="row" style="margin:15px 0;">
+    <div class="col-md-12">
+        <p style="font-size: 24px;">{{ race.nyt_race_description }}</p>
+    </div>
+</div>
 {% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table races" id="race-{{ race.raceid }}">
+            <tr>
+                <td><strong>Accept AP calls</strong></td><td><input class="race-ap-toggle" data-raceid="{{ race.raceid }}" type="checkbox" {% if race.accept_ap_calls %}checked {% endif%}data-toggle="toggle" data-onstyle="success"></td>
+            </tr>
+            <tr>
+                <td><strong>Race name</strong></td><td><input class="form-control nyt_race_name" name="nyt_race_name" data-raceid="{{ race.raceid }}" value="{% if race.nyt_race_name %}{{ race.nyt_race_name }}{% else %}{{ race }}{% endif %}"></td>
+            </tr>
+            <tr>
+                <td><strong>Race description</strong></td><td><input class="form-control nyt_race_description" name="nyt_race_description" data-raceid="{{ race.raceid }}" value="{% if race.nyt_race_description %}{{ race.nyt_race_description }}{% else %}{% endif %}"></td>
+            </tr>
+            <tr>
+                <td><strong>Winner</strong></td>
+                <td>
+                    <select{% if race.accept_ap_calls %} disabled{% endif %} class="form-control nyt_winner" name="nyt_winner" data-raceid="{{ race.raceid }}">
+                        <option value=""></option>
+                        {% for c in candidates %}
+                         <option value="{{ c.candidateid }}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if candidates %}
+        <h3>Candidates</h3>
+        <table class="table candidates">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Display?</th>
+            </tr>
+            {% for c in candidates %}
+            <tr id="candidate-{{ c.candidateid }}">
+                <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-name" name="nyt_candidate_name" value="{{ c }}"></td>
+                <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-description" name="nyt_candidate_description" value="{% if nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}"></td>
+                <td><input data-candidateid="{{ c.candidateid }}" type="checkbox" class="form-control candidate-important" name="nyt_candidate_important" {% if c.nyt_candidate_important %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}
 
@@ -41,7 +75,12 @@
     var submit_race = function(data){
         var race_id = $(this).attr('data-raceid');
         var data = {};
-        data['accept_ap_calls'] = $('#race-' + race_id).prop('checked');
+
+        data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
+        data['nyt_race_description'] = $('#race-' + race_id + ' input.nyt_race_description').val()
+        data['nyt_race_name'] = $('#race-' + race_id + ' input.nyt_race_name').val()
+        data['nyt_winner'] = $('#race-' + race_id + ' select.nyt_winner').val()
+
         $.ajax({
             type: "POST",
             url: '/elex/race/' + race_id + '/',
@@ -54,9 +93,11 @@
     var submit_candidate = function(data){
         var candidate_id = $(this).attr('data-candidateid');
         var data = {};
+
         data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
         data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' input.candidate-description').val();
         data['nyt_candidate_important'] = $('#candidate-' + candidate_id + ' input.candidate-important').prop('checked');
+
         $.ajax({
             type: "POST",
             url: '/elex/candidate/' + candidate_id + '/',
@@ -66,7 +107,8 @@
         });
     };
 
-    $('input.form-control').on('blur', submit_candidate);
+    $('table.races input.form-control').on('blur', submit_race);
+    $('table.candidates input.form-control').on('blur', submit_candidate);
     $('input.candidate-important').on('change', submit_candidate)
     $('input.race-ap-toggle').on('change', submit_race);
 </script>

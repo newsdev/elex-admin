@@ -17,6 +17,7 @@ app = Flask(__name__)
 def build_context():
     context = {}
     context['CDN_URL'] = utils.CDN_URL
+    context['RACEDATE'] = utils.RACEDATE
     return dict(context)
 
 @app.route('/elex/')

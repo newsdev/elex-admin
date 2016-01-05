@@ -1,7 +1,9 @@
 from peewee import *
 from playhouse.postgres_ext import *
 
-database = PostgresqlExtDatabase('elex', **{'user': 'elex'})
+import utils
+
+database = PostgresqlExtDatabase('elex_%s' % utils.RACEDATE, **{'user': 'elex'})
 
 
 class BaseModel(Model):
@@ -18,6 +20,27 @@ class OverrideCandidate(BaseModel):
 
     class Meta:
         db_table = 'override_candidates'
+
+    @classmethod
+    def add_candidates(cls):
+        races = ElexRace.select()
+
+        for race in list(races):
+
+            candidates = list(race.state())
+
+            for candidate in candidates:
+                try:
+                    oc = cls.get(cls.candidate_candidateid == candidate.candidateid)
+                except cls.DoesNotExist:
+                    oc = cls.create(candidate_candidateid=candidate.candidateid)
+
+                oc.nyt_races = [int(race.raceid)]
+                oc.save()
+                print oc.candidate_candidateid
+
+        database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
+        database.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
 
 
 class OverrideRace(BaseModel):
