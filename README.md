@@ -1,6 +1,8 @@
-![screen shot 2016-01-04 at 4 47 58 pm](https://cloud.githubusercontent.com/assets/109988/12101478/fb48694c-b302-11e5-8ff5-0a607bf7c848.png)
+![logo](https://cloud.githubusercontent.com/assets/109988/12101478/fb48694c-b302-11e5-8ff5-0a607bf7c848.png)
 
 `elex-admin` is a lightweight, Flask-based CRUD admin for election results data loaded with [elex-loader](https://github.com/newsdev/elex-loader) and [elex](https://github.com/newsdev/elex).
+
+![admin screenshot](https://cloud.githubusercontent.com/assets/109988/12132936/acc0491a-b3ee-11e5-9563-fa7583b83c8d.png)
 
 ## Getting started
 * Set up software and environment.
