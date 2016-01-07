@@ -70,56 +70,67 @@
 
 {% block extrajs %}
 <script type="text/javascript">
-    var update_race_text = function(data, race_id){
-        $('#target-nyt_race_description').text(data['nyt_race_description']);
-        $('#target-nyt_race_name').text(data['nyt_race_name']);
-        var winner = data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
-        if (winner) {
-            $('#race-' + race_id + ' select.nyt_winner').prop('disabled', true);
-        } else {
-            $('#race-' + race_id + ' select.nyt_winner').prop('disabled', false);
-        }
-    };
+    $(function(){
+        var update_race_text = function(data, race_id){
+            /*
+                Update the static text for a race when it is changed.
+            */
+            $('#target-nyt_race_description').text(data['nyt_race_description']);
+            $('#target-nyt_race_name').text(data['nyt_race_name']);
+            var winner = data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
+            if (winner) {
+                $('#race-' + race_id + ' select.nyt_winner').prop('disabled', true);
+            } else {
+                $('#race-' + race_id + ' select.nyt_winner').prop('disabled', false);
+            }
+        };
 
-    var submit_race = function(data){
-        var race_id = $(this).attr('data-raceid');
-        var data = {};
+        var submit_race = function(data){
+            /*
+                Submit the current state of a race in the form.
+            */
+            var race_id = $(this).attr('data-raceid');
+            var data = {};
 
-        data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
-        data['nyt_race_description'] = $('#race-' + race_id + ' input.nyt_race_description').val()
-        data['nyt_race_name'] = $('#race-' + race_id + ' input.nyt_race_name').val()
-        data['nyt_winner'] = $('#race-' + race_id + ' select.nyt_winner').val()
+            data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
+            data['nyt_race_description'] = $('#race-' + race_id + ' input.nyt_race_description').val()
+            data['nyt_race_name'] = $('#race-' + race_id + ' input.nyt_race_name').val()
+            data['nyt_winner'] = $('#race-' + race_id + ' select.nyt_winner').val()
 
-        $.ajax({
-            type: "POST",
-            url: '/elex/race/' + race_id + '/',
-            data: data,
-            success: function(response){ update_race_text(data,race_id); },
-            dataType: 'JSON'
-        });
-    };
+            $.ajax({
+                type: "POST",
+                url: '/elections/2016/admin/race/' + race_id + '/',
+                data: data,
+                success: function(response){ update_race_text(data,race_id); },
+                dataType: 'JSON'
+            });
+        };
 
-    var submit_candidate = function(data){
-        var candidate_id = $(this).attr('data-candidateid');
-        var data = {};
+        var submit_candidate = function(data){
+            /*
+                Submit the current state of a candidate in the form.
+            */
+            var candidate_id = $(this).attr('data-candidateid');
+            var data = {};
 
-        data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
-        data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' input.candidate-description').val();
-        data['nyt_candidate_important'] = $('#candidate-' + candidate_id + ' input.candidate-important').prop('checked');
+            data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
+            data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' input.candidate-description').val();
+            data['nyt_candidate_important'] = $('#candidate-' + candidate_id + ' input.candidate-important').prop('checked');
 
-        $.ajax({
-            type: "POST",
-            url: '/elex/candidate/' + candidate_id + '/',
-            data: data,
-            success: function(response){ console.log(response); },
-            dataType: 'JSON'
-        });
-    };
+            $.ajax({
+                type: "POST",
+                url: '/elections/2016/admin/candidate/' + candidate_id + '/',
+                data: data,
+                success: function(response){ console.log(response); },
+                dataType: 'JSON'
+            });
+        };
 
-    $('table.races input.form-control').on('blur', submit_race);
-    $('table.candidates input.form-control').on('blur', submit_candidate);
-    $('input.candidate-important').on('change', submit_candidate)
-    $('select.nyt_winner').on('change', submit_race);
-    $('input.race-ap-toggle').on('change', submit_race);
+        $('table.races input.form-control').on('blur', submit_race);
+        $('table.candidates input.form-control').on('blur', submit_candidate);
+        $('input.candidate-important').on('change', submit_candidate)
+        $('select.nyt_winner').on('change', submit_race);
+        $('input.race-ap-toggle').on('change', submit_race);
+    });
 </script>
 {% endblock %}
