@@ -24,9 +24,9 @@ def update_views(database):
     """
     Resets the Postgres VIEWs.
     """
-    database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
-    database.execute_sql(utils.ELEX_RACE_VIEW_COMMAND)
-    database.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
+    database.execute_sql(ELEX_RESULTS_VIEW_COMMAND)
+    database.execute_sql(ELEX_RACE_VIEW_COMMAND)
+    database.execute_sql(ELEX_CANDIDATE_VIEW_COMMAND)
 
 def clean_payload(payload):
     """

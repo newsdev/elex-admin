@@ -28,7 +28,7 @@ def race_detail(raceid):
         return render_template('race_detail.html', **context)
 
     if request.method == 'POST':
-        payload = clean_payload(dict(request.form))
+        payload = utils.clean_payload(dict(request.form))
         try:
             r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid)
         except models.OverrideRace.DoesNotExist:
