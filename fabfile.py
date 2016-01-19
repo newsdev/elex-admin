@@ -69,7 +69,7 @@ def bounce_daemon():
 
 @api.task
 def candidates(racedate):
-    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && export RACEDATE=%(racedate)s python add_candidates_to_races.py' % env)
+    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && export RACEDATE=%(racedate)s && python elex_admin/add_candidates_to_races.py' % env)
 
 @api.task
 def deploy():
