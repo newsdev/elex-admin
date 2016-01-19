@@ -12,6 +12,7 @@ import models
 import utils
 
 app = Flask(__name__)
+app.debug=True
 
 @app.route('/elections/2016/admin/')
 def race_list():

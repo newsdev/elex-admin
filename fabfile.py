@@ -7,7 +7,7 @@ from fabric.state import env
 
 ENVIRONMENTS = {
     "prd": {
-        "hosts": [os.environ.get('ELEX_LOADER_PRD_HOST', None)],
+        "hosts": [os.environ.get('ELEX_ADMIN_PRD_HOST', None)],
     }
 }
 
