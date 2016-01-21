@@ -57,7 +57,7 @@
             {% for c in candidates %}
             <tr id="candidate-{{ c.candidateid }}">
                 <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-name" name="nyt_candidate_name" value="{{ c }}"></td>
-                <td><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-description" name="nyt_candidate_description" value="{% if nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}"></td>
+                <td><textarea data-candidateid="{{ c.candidateid }}" class="form-control candidate-description" name="nyt_candidate_description">{% if c.nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}</textarea></td>
                 <td><input data-candidateid="{{ c.candidateid }}" type="checkbox" class="form-control candidate-important" name="nyt_candidate_important" {% if c.nyt_candidate_important %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
             </tr>
             {% endfor %}
@@ -114,8 +114,10 @@
             var data = {};
 
             data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
-            data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' input.candidate-description').val();
+            data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' textarea.candidate-description').val();
             data['nyt_candidate_important'] = $('#candidate-' + candidate_id + ' input.candidate-important').prop('checked');
+
+            console.log(data);
 
             $.ajax({
                 type: "POST",
@@ -126,8 +128,8 @@
             });
         };
 
-        $('table.races input.form-control').on('blur', submit_race);
-        $('table.candidates input.form-control').on('blur', submit_candidate);
+        $('table.races .form-control').on('blur', submit_race);
+        $('table.candidates .form-control').on('blur', submit_candidate);
         $('input.candidate-important').on('change', submit_candidate)
         $('select.nyt_winner').on('change', submit_race);
         $('input.race-ap-toggle').on('change', submit_race);

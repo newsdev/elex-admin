@@ -18,7 +18,7 @@ class BaseModel(Model):
 
 class OverrideCandidate(BaseModel):
     candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
-    nyt_candidate_description = CharField(null=True)
+    nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
     nyt_races = ArrayField(field_class=IntegerField)
     nyt_candidate_important = BooleanField(null=True)
@@ -45,8 +45,10 @@ class OverrideCandidate(BaseModel):
 
 
 class OverrideRace(BaseModel):
+    report = BooleanField(null=True)
+    report_description = TextField(null=True)
     accept_ap_calls = BooleanField(null=True)
-    nyt_race_description = CharField(null=True)
+    nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
     nyt_winner = CharField(null=True)
     race_raceid = CharField(primary_key=True)
@@ -58,7 +60,7 @@ class OverrideRace(BaseModel):
 
 class ElexCandidate(BaseModel):
     candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
-    nyt_candidate_description = CharField(null=True)
+    nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
     nyt_races = ArrayField(field_class=IntegerField)
     ballotorder = IntegerField(null=True)
@@ -82,8 +84,10 @@ class ElexCandidate(BaseModel):
 
 
 class ElexRace(BaseModel):
+    report = BooleanField(null=True)
+    report_description = TextField(null=True)
     accept_ap_calls = BooleanField(null=True)
-    nyt_race_description = CharField(null=True)
+    nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
     nyt_winner = CharField(null=True)
     race_raceid = CharField(primary_key=True)
@@ -129,11 +133,13 @@ class ElexRace(BaseModel):
 
 
 class ElexResult(BaseModel):
+    report = BooleanField(null=True)
+    report_description = TextField(null=True)
     candidate_candidateid = CharField(db_column='candidate_candidateid')
-    nyt_candidate_description = CharField(null=True)
+    nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
     accept_ap_calls = BooleanField(null=True)
-    nyt_race_description = CharField(null=True)
+    nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
     nyt_winner = BooleanField(null=True)
     race_raceid = CharField(null=True)
