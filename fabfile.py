@@ -65,7 +65,7 @@ def pip_install():
 
 @api.task
 def bounce_daemon():
-    api.run('sudo service %(project_name)s restart' % env)
+    api.run('sudo service %(project_name)s-%(racedate)s restart' % env)
 
 @api.task
 def candidates(racedate):
