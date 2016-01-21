@@ -1,6 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h1>States</h1>
+<table class="table">
+<tr>
+    <th>State</th>
+    <th>Reporting?</th>
+    <th>Description</th>
+</tr>
+
+{% for state in states %}
+<tr id="state-{{ state.statepostal }}">
+    <td>{{ state.statepostal }}</td>
+    <td><input class="state-report-toggle" data-state="{{ state.statepostal }}" type="checkbox" {% if state.report %}checked {% endif%}data-toggle="toggle" data-onstyle="success"></td>
+    <td><textarea data-state="{{ state.statepostal }}" class="form-control report-description" name="report_description">{% if state.report_description %}{{ state.report_description }}{% endif %}</textarea></td>
+</tr>
+{% endfor %}
+</table>
+
+
 <h1>Races</h1>
 <table class="table">
 <tr>
@@ -9,6 +27,7 @@
     <th>Office</th>
     <th>Type</th>
 </tr>
+
 {% for race in races %}
 <tr>
     <td><a href="/elections/2016/admin/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
@@ -18,4 +37,34 @@
 </tr>
 {% endfor %}
 </table>
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+    $(function(){
+        var submit_state = function(data){
+            /*
+                Submit the current state of a race in the form.
+            */
+            var statepostal = $(this).attr('data-state');
+            var data = {};
+
+            data['report'] = $('#state-' + statepostal + ' input.state-report-toggle').prop('checked');
+            data['report_description'] = $('#state-' + statepostal + ' textarea.report-description').val()
+
+            console.log(data);
+
+            $.ajax({
+                type: "POST",
+                url: '/elections/2016/admin/state/' + statepostal + '/',
+                data: data,
+                success: function(response){  },
+                dataType: 'JSON'
+            });
+        };
+
+        $('textarea.report-description').on('change', submit_state)
+        $('input.state-report-toggle').on('change', submit_state);
+    });
+</script>
 {% endblock %}

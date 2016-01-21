@@ -5,6 +5,7 @@ import glob
 import json
 import os
 import re
+from sets import Set
 
 from flask import Flask, render_template, request
 
@@ -18,7 +19,33 @@ app.debug=True
 def race_list():
     context = utils.build_context()
     context['races'] = models.ElexRace.select()
+    context['states'] = []
+
+    state_list = []
+    for race in context['races']:
+        state_list.append(race.statepostal)
+    state_list = list(Set(state_list))
+
+    for state in state_list:
+        race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
+        state_dict = {}
+        state_dict['statepostal'] = state
+        state_dict['report'] = race.report
+        state_dict['report_description'] = race.report_description
+        context['states'].append(state_dict)
+
     return render_template('race_list.html', **context)
+
+@app.route('/elections/2016/admin/state/<statepostal>/', methods=['POST'])
+def state_detail(statepostal):
+    if request.method == 'POST':
+        payload = utils.clean_payload(dict(request.form))
+        races = [r.raceid for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
+        r = models.OverrideRace.update(report=payload['report'], report_description=payload['report_description']).where(models.OverrideRace.race_raceid << races)
+        r.execute()
+        utils.update_views(models.database)
+
+        return json.dumps({"message": "success"})
 
 @app.route('/elections/2016/admin/race/<raceid>/', methods=['GET', 'POST'])
 def race_detail(raceid):

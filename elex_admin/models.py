@@ -57,6 +57,19 @@ class OverrideRace(BaseModel):
     class Meta:
         db_table = 'override_races'
 
+    @classmethod
+    def create_override_races(cls):
+        races = ElexRace.select()
+        for race in list(races):
+            print race.raceid
+            try:
+                r = cls.get(cls.race_raceid == race.raceid)
+            except cls.DoesNotExist:
+                r = cls.create(race_raceid=race.raceid)
+
+        database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
+        database.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
+
 
 class ElexCandidate(BaseModel):
     candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
