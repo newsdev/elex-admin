@@ -26,6 +26,8 @@ export ELEX_ADMIN_CDN_URL=http://my.cdn.url.s3.amazonaws.com/cdn
 
 * Run `bootstrap.sh`, `init.sh` and `update.sh` from [elex-loader](https://github.com/newsdev/elex-loader).
 
+* Run `python elex_admin/initialize_racedate.py` to set up candidates and races for overrides.
+
 * Run the admin.
 ```
 python -m elex_admin.app
