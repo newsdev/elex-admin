@@ -18,8 +18,6 @@ ELEX_RESULTS_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_results as
        LEFT JOIN override_races as o on r.raceid = o.race_raceid
 ;"""
 
-RACEDATE = os.environ.get('RACEDATE', None)
-
 def update_views(database):
     """
     Resets the Postgres VIEWs.
@@ -59,11 +57,11 @@ def set_winner(candidateid, raceid):
     """
     print candidateid, raceid
 
-def build_context():
+def build_context(racedate):
     """
     Every page needs these two things.
     """
     context = {}
     context['CDN_URL'] = CDN_URL
-    context['RACEDATE'] = RACEDATE
+    context['RACEDATE'] = racedate
     return dict(context)

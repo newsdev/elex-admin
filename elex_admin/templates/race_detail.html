@@ -99,7 +99,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '/elections/2016/admin/race/' + race_id + '/',
+                url: '/elections/2016/admin/{{ RACEDATE }}/race/' + race_id + '/',
                 data: data,
                 success: function(response){ update_race_text(data,race_id); },
                 dataType: 'JSON'
@@ -121,7 +121,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '/elections/2016/admin/candidate/' + candidate_id + '/',
+                url: '/elections/2016/admin/{{ RACEDATE }}/candidate/' + candidate_id + '/',
                 data: data,
                 success: function(response){ console.log(response); },
                 dataType: 'JSON'

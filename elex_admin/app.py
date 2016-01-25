@@ -15,9 +15,9 @@ import utils
 app = Flask(__name__)
 app.debug=True
 
-@app.route('/elections/2016/admin/')
-def race_list():
-    context = utils.build_context()
+@app.route('/elections/2016/admin/<racedate>/')
+def race_list(racedate):
+    context = utils.build_context(racedate)
     context['races'] = models.ElexRace.select()
     context['states'] = []
 
@@ -36,8 +36,8 @@ def race_list():
 
     return render_template('race_list.html', **context)
 
-@app.route('/elections/2016/admin/state/<statepostal>/', methods=['POST'])
-def state_detail(statepostal):
+@app.route('/elections/2016/admin/<racedate>/state/<statepostal>/', methods=['POST'])
+def state_detail(racedate, statepostal):
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
         races = [r.raceid for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
@@ -47,10 +47,10 @@ def state_detail(statepostal):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/2016/admin/race/<raceid>/', methods=['GET', 'POST'])
-def race_detail(raceid):
+@app.route('/elections/2016/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
+def race_detail(racedate, raceid):
     if request.method == 'GET':
-        context = utils.build_context()
+        context = utils.build_context(racedate)
         context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid)
         context['candidates'] = models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(int(raceid)))
         return render_template('race_detail.html', **context)
@@ -70,8 +70,8 @@ def race_detail(raceid):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/2016/admin/candidate/<candidateid>/', methods=['POST'])
-def candidate_detail(candidateid):
+@app.route('/elections/2016/admin/<racedate>/candidate/<candidateid>/', methods=['POST'])
+def candidate_detail(racedate, candidateid):
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
 
