@@ -67,12 +67,16 @@ def pip_install():
     api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && pip install -r requirements.txt' % env)
 
 @api.task
-def bounce():
+def bounce(racedate=None):
+    if racedate:
+        env.racedate = racedate
     api.run('sudo service %(project_name)s-%(racedate)s restart' % env)
 
 @api.task
 def candidates(racedate):
-    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && export RACEDATE=%(racedate)s && python elex_admin/add_candidates_to_races.py' % env)
+    if racedate:
+        env.racedate = racedate
+    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && export RACEDATE=%(racedate)s && python elex_admin/initialize_racedate.py' % env)
 
 @api.task
 def deploy():

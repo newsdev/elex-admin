@@ -45,6 +45,9 @@ class OverrideCandidate(BaseModel):
 
 
 class OverrideRace(BaseModel):
+    nyt_race_preview = TextField(null=True)
+    nyt_race_result_description = TextField(null=True)
+    nyt_delegate_allocation = TextField(null=True)
     report = BooleanField(null=True)
     report_description = TextField(null=True)
     accept_ap_calls = BooleanField(null=True)
@@ -97,6 +100,9 @@ class ElexCandidate(BaseModel):
 
 
 class ElexRace(BaseModel):
+    nyt_race_preview = TextField(null=True)
+    nyt_race_result_description = TextField(null=True)
+    nyt_delegate_allocation = TextField(null=True)
     report = BooleanField(null=True)
     report_description = TextField(null=True)
     accept_ap_calls = BooleanField(null=True)
@@ -146,6 +152,9 @@ class ElexRace(BaseModel):
 
 
 class ElexResult(BaseModel):
+    nyt_race_preview = TextField(null=True)
+    nyt_race_result_description = TextField(null=True)
+    nyt_delegate_allocation = TextField(null=True)
     report = BooleanField(null=True)
     report_description = TextField(null=True)
     candidate_candidateid = CharField(db_column='candidate_candidateid')
