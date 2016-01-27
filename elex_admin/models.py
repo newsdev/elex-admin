@@ -22,6 +22,7 @@ class OverrideCandidate(BaseModel):
     nyt_candidate_name = CharField(null=True)
     nyt_races = ArrayField(field_class=IntegerField)
     nyt_candidate_important = BooleanField(null=True)
+    nyt_winner = BooleanField(null=True)
 
     class Meta:
         db_table = 'override_candidates'
@@ -53,9 +54,9 @@ class OverrideRace(BaseModel):
     accept_ap_calls = BooleanField(null=True)
     nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
-    nyt_winner = CharField(null=True)
     race_raceid = CharField(primary_key=True)
     nyt_race_important = BooleanField(null=True)
+    nyt_called = BooleanField(null=True)
 
     class Meta:
         db_table = 'override_races'
@@ -89,6 +90,7 @@ class ElexCandidate(BaseModel):
     polnum = CharField(null=True)
     unique = CharField(db_column='unique_id', null=True)
     nyt_candidate_important = BooleanField(null=True)
+    nyt_winner = BooleanField(null=True)
 
     class Meta:
         db_table = 'elex_candidates'
@@ -108,7 +110,6 @@ class ElexRace(BaseModel):
     accept_ap_calls = BooleanField(null=True)
     nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
-    nyt_winner = CharField(null=True)
     race_raceid = CharField(primary_key=True)
     description = CharField(null=True)
     id = CharField(null=True)
@@ -128,6 +129,7 @@ class ElexRace(BaseModel):
     test = BooleanField(null=True)
     uncontested = BooleanField(null=True)
     nyt_race_important = BooleanField(null=True)
+    nyt_called = BooleanField(null=True)
 
     class Meta:
         db_table = 'elex_races'
@@ -204,6 +206,7 @@ class ElexResult(BaseModel):
     winner = BooleanField(null=True)
     nyt_race_important = BooleanField(null=True)
     nyt_candidate_important = BooleanField(null=True)
+    nyt_called = BooleanField(null=True)
 
     class Meta:
         db_table = "elex_results"

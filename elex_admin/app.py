@@ -62,8 +62,7 @@ def race_detail(racedate, raceid):
         except models.OverrideRace.DoesNotExist:
             r = models.OverrideRace.create(race_raceid=raceid)
 
-        if payload.get('nyt_winner', None):
-            utils.set_winner(payload['nyt_winner'], raceid)
+        utils.set_winner(payload['nyt_winner'], raceid)
 
         utils.update_model(r, payload)
         utils.update_views(models.database)

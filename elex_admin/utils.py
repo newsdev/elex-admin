@@ -47,15 +47,43 @@ def update_model(cls, payload):
     update and save that model class with the keys/values.
     """
     for k,v in payload.items():
-        setattr(cls,k,v)
+        if k != 'nyt_winner':
+            setattr(cls,k,v)
     cls.save()
 
 def set_winner(candidateid, raceid):
     """
-    This is the part where I might need to do more things?
-    Will check in with Wilson.
+    Handles setting a winner. Sets a race to called and
+    a candidate as the winner and other candidates as
+    not winners. If the candidateid is null, will reset 
+    the race to be uncalled and remove the previous winner.
     """
-    print candidateid, raceid
+    import models
+    if candidateid:
+        r = models.OverrideRace.update(nyt_called=True).where(models.OverrideRace.race_raceid == int(raceid))
+        nc = models.OverrideCandidate\
+                .update(nyt_winner=False)\
+                .where(
+                    models.OverrideCandidate.candidate_candidateid != int(candidateid),
+                    models.OverrideCandidate.nyt_races.contains(int(raceid))
+                )
+        yc = models.OverrideCandidate\
+                .update(nyt_winner=True)\
+                .where(
+                    models.OverrideCandidate.candidate_candidateid == int(candidateid),
+                    models.OverrideCandidate.nyt_races.contains(int(raceid))
+                )
+
+        r.execute()
+        nc.execute()
+        yc.execute()
+    else:
+        r = models.OverrideRace.update(nyt_called=False).where(models.OverrideRace.race_raceid == int(raceid))
+        nc = models.OverrideCandidate\
+                .update(nyt_winner=False)\
+                .where(models.OverrideCandidate.nyt_races.contains(int(raceid)))
+        r.execute()
+        nc.execute()
 
 def build_context(racedate):
     """
