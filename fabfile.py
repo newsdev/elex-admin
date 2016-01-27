@@ -67,7 +67,7 @@ def pip_install():
     api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && pip install -r requirements.txt' % env)
 
 @api.task
-def bounce_daemon():
+def bounce():
     api.run('sudo service %(project_name)s-%(racedate)s restart' % env)
 
 @api.task
@@ -78,4 +78,4 @@ def candidates(racedate):
 def deploy():
     pull()
     pip_install()
-    bounce_daemon()
+    bounce()
