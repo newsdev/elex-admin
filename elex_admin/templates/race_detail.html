@@ -46,10 +46,10 @@
                 <td><strong>Winner</strong></td>
                 <td>
                     <select{% if race.accept_ap_calls %} disabled{% endif %} class="form-control nyt_winner" name="nyt_winner" data-raceid="{{ race.raceid }}">
+                        <option value=""></option>
                         {% for c in candidates %}
-                         <option{% if race.nyt_winner == c.candidateid %} selected{% endif %} value="{{ c.candidateid }}">{{ c }}</option>
+                         <option{% if c.nyt_winner %} selected{% endif %} value="{{ c.candidateid }}">{{ c }}</option>
                         {% endfor %}
-                        <option{% if not race.nyt_winner %} selected{% endif %} value=""></option>
                     </select>
                 </td>
             </tr>
