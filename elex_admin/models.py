@@ -23,6 +23,7 @@ class OverrideCandidate(BaseModel):
     nyt_races = ArrayField(field_class=IntegerField)
     nyt_candidate_important = BooleanField(null=True)
     nyt_winner = BooleanField(null=True)
+    nyt_display_order = IntegerField(null=True)
 
     class Meta:
         db_table = 'override_candidates'
@@ -32,12 +33,13 @@ class OverrideCandidate(BaseModel):
         races = ElexRace.select()
         for race in list(races):
             candidates = list(race.state())
-            for candidate in candidates:
+            for idx, candidate in enumerate(candidates):
                 try:
                     oc = cls.get(cls.candidate_candidateid == candidate.candidateid)
                 except cls.DoesNotExist:
                     oc = cls.create(candidate_candidateid=candidate.candidateid)
                 oc.nyt_races = [int(race.raceid)]
+                oc.nyt_display_order = idx
                 oc.save()
                 print oc.candidate_candidateid
 
@@ -91,6 +93,7 @@ class ElexCandidate(BaseModel):
     unique = CharField(db_column='unique_id', null=True)
     nyt_candidate_important = BooleanField(null=True)
     nyt_winner = BooleanField(null=True)
+    nyt_display_order = IntegerField(null=True)
 
     class Meta:
         db_table = 'elex_candidates'
@@ -207,6 +210,7 @@ class ElexResult(BaseModel):
     nyt_race_important = BooleanField(null=True)
     nyt_candidate_important = BooleanField(null=True)
     nyt_called = BooleanField(null=True)
+    nyt_display_order = IntegerField(null=True)
 
     class Meta:
         db_table = "elex_results"

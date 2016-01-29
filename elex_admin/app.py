@@ -52,7 +52,7 @@ def race_detail(racedate, raceid):
     if request.method == 'GET':
         context = utils.build_context(racedate)
         context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid)
-        context['candidates'] = models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(int(raceid)))
+        context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(int(raceid))), key=lambda x:x.nyt_display_order)
         return render_template('race_detail.html', **context)
 
     if request.method == 'POST':
@@ -65,6 +65,21 @@ def race_detail(racedate, raceid):
         utils.set_winner(payload['nyt_winner'], raceid)
 
         utils.update_model(r, payload)
+        utils.update_views(models.database)
+
+        return json.dumps({"message": "success"})
+
+@app.route('/elections/2016/admin/<racedate>/candidateorder/', methods=['POST'])
+def candidate_order(racedate):
+    if request.method == 'POST':
+        payload = utils.clean_payload(dict(request.form))
+
+        if payload.get('candidates', None):
+            print payload['candidates']
+            for idx, candidateid in enumerate(payload['candidates'].split(',')):
+                oc = models.OverrideCandidate.update(nyt_display_order=idx).where(models.OverrideCandidate.candidate_candidateid == candidateid)
+                oc.execute()
+
         utils.update_views(models.database)
 
         return json.dumps({"message": "success"})
