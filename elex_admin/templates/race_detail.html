@@ -178,10 +178,24 @@
             });
         }
 
+        var confirm_race_call = function() {
+            var candidate_id = $(this).attr('data-candidateid');
+            var nyt_candidate_name = $('#candidate-' + candidate_id + ' input.candidate-name').val();
+            if (!candidate_id || !nyt_candidate_name) return false;
+            var confirmation = confirm("Are you sure that you want to set " + nyt_candidate_name + " as the winner?");
+            if (confirmation === true) {
+                // execute submit_race function with original context
+                submit_race.bind(this)();
+            } else {
+                // reset winner to blank — technically should be previous winner?
+                $('select.nyt_winner').val("");
+            }
+        }
+
         $('table.races .form-control').on('blur', submit_race);
         $('table.candidates .form-control').on('blur', submit_candidate);
-        $('input.candidate-important').on('change', submit_candidate)
-        $('select.nyt_winner').on('change', submit_race);
+        $('input.candidate-important').on('change', submit_candidate);
+        $('select.nyt_winner').on('change', confirm_race_call);
         $('input.race-ap-toggle').on('change', submit_race);
 
         $('#candidate-table').rowSorter({
