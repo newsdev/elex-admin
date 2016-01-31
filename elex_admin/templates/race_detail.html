@@ -85,7 +85,7 @@
                 <td width="32%"><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-name" name="nyt_candidate_name" value="{{ c }}"></td>
                 <td width="42%"><textarea data-candidateid="{{ c.candidateid }}" class="form-control candidate-description" name="nyt_candidate_description">{% if c.nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}</textarea></td>
                 <td width="12%"><input data-candidateid="{{ c.candidateid }}" type="checkbox" class="form-control candidate-important" name="nyt_candidate_important" {% if c.nyt_candidate_important %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
-                <td width="10%"><input data-candidateid="{{ c.candidateid }}" class="form-control nyt-delegates" name="nyt_candidate_name" value="{{ c.nyt_delegates }}"></td>
+                <td width="10%"><input data-candidateid="{{ c.candidateid }}" class="form-control nyt-delegates" name="nyt_candidate_name" value="{% if c.nyt_delegates %}{{ c.nyt_delegates }}{% else %}0{% endif %}"></td>
                 <td class="sort-handler" width="4%"></td>
             </tr>
             {% endfor %}
