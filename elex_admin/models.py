@@ -24,6 +24,7 @@ class OverrideCandidate(BaseModel):
     nyt_candidate_important = BooleanField(null=True)
     nyt_winner = BooleanField(null=True)
     nyt_display_order = IntegerField(null=True)
+    nyt_delegates = IntegerField(null=True)
 
     class Meta:
         db_table = 'override_candidates'
@@ -94,6 +95,7 @@ class ElexCandidate(BaseModel):
     nyt_candidate_important = BooleanField(null=True)
     nyt_winner = BooleanField(null=True)
     nyt_display_order = IntegerField(null=True)
+    nyt_delegates = IntegerField(null=True)
 
     class Meta:
         db_table = 'elex_candidates'
@@ -211,6 +213,7 @@ class ElexResult(BaseModel):
     nyt_candidate_important = BooleanField(null=True)
     nyt_called = BooleanField(null=True)
     nyt_display_order = IntegerField(null=True)
+    nyt_delegates = IntegerField(null=True)
 
     class Meta:
         db_table = "elex_results"
