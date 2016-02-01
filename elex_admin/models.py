@@ -144,6 +144,8 @@ class ElexRace(BaseModel):
 
     def state(self):
         results = ElexResult.select().where(ElexResult.raceid == self.raceid).where(ElexResult.level == 'state')
+        if len(results) == 0:
+            results = ElexResult.select().where(ElexResult.raceid == self.raceid).where(ElexResult.level == None)
         return sorted([e for e in results], key=lambda x: x.last)
 
     def counties(self):
