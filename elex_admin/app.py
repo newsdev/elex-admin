@@ -53,6 +53,12 @@ def race_detail(racedate, raceid):
         context = utils.build_context(racedate)
         context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid)
         context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(int(raceid))), key=lambda x:x.nyt_display_order)
+
+        context['ap_winner'] = None
+        ap_winner = models.ElexResult.select().where(models.ElexResult.raceid == raceid, models.ElexResult.winner == True)
+        if len(ap_winner) > 0:
+            context['ap_winner'] = ap_winner[0]
+
         return render_template('race_detail.html', **context)
 
     if request.method == 'POST':
