@@ -20,11 +20,21 @@
     </div>
 </div>
 
+{% if race.nyt_race_description %}
 <div class="row" style="margin:15px 0;">
     <div class="col-md-12">
-        <p id="target-nyt_race_description" style="font-size: 24px;">{% if race.nyt_race_description %}{{ race.nyt_race_description }}{% else %}{% endif %}</p>
+        <p id="target-nyt_race_description" style="font-size: 24px;">{{ race.nyt_race_description }}</p>
     </div>
 </div>
+{% endif %}
+
+{% if ap_winner %}
+<div class="row" style="margin:15px 0;">
+    <div class="col-md-12">
+        <p style="font-size: 32px;">The AP has declared <strong style="color: rgb(51, 102, 0);">{{ ap_winner.first }} {{ ap_winner.last }}</strong> the winner.</p>
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="col-md-12">
