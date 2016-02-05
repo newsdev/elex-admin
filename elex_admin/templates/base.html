@@ -33,6 +33,21 @@
 
     <div id="content" class="container">{% block content %}{% endblock %}</div>
 
+    <div class="navbar-fixed-bottom navbar navbar-default navbar-primary" style="border-top: 1px solid #e5e5e5;">
+      <div class="container">
+        <ul class="nav navbar-nav navbar-left">
+          <li class="navbar-summary">
+            <span style="color: #333;font-weight:400;font-family: nyt-franklin;">
+                Goes in your <code>elex-loader/overrides/</code> folder.</span>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right navbar-bits">
+          <li><a href="/elections/2016/admin/{{ RACEDATE }}/csv/candidate/">Candidate overrides (csv)</a></li>
+          <li><a href="/elections/2016/admin/{{ RACEDATE }}/csv/candidate/">Race overrides (csv)</a></li>
+        </ul>
+      </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
