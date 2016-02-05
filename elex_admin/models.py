@@ -1,3 +1,4 @@
+import collections
 import os
 
 from peewee import *
@@ -29,6 +30,18 @@ class OverrideCandidate(BaseModel):
     class Meta:
         db_table = 'override_candidates'
 
+    def serialize(self):
+        return collections.OrderedDict([
+            utils.make_field(self, 'candidate_candidateid'),
+            utils.make_field(self, 'nyt_candidate_name'),
+            utils.make_field(self, 'nyt_candidate_important'),
+            utils.make_field(self, 'nyt_candidate_description'),
+            ('nyt_races', "{%s}" % ",".join([unicode(r) for r in self.nyt_races])),
+            utils.make_field(self, 'nyt_display_order'),
+            utils.make_field(self, 'nyt_winner'),
+            utils.make_field(self, 'nyt_delegates')
+        ])
+
     @classmethod
     def add_candidates(cls):
         races = ElexRace.select()
@@ -58,11 +71,26 @@ class OverrideRace(BaseModel):
     nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
     race_raceid = CharField(primary_key=True)
-    nyt_race_important = BooleanField(null=True)
     nyt_called = BooleanField(null=True)
+    nyt_race_important = BooleanField(null=True)
 
     class Meta:
         db_table = 'override_races'
+
+    def serialize(self):
+        return collections.OrderedDict([
+            utils.make_field(self, 'nyt_race_preview'),
+            utils.make_field(self, 'nyt_race_result_description'),
+            utils.make_field(self, 'nyt_delegate_allocation'),
+            utils.make_field(self, 'report'),
+            utils.make_field(self, 'report_description'),
+            utils.make_field(self, 'race_raceid'),
+            utils.make_field(self, 'nyt_race_name'),
+            utils.make_field(self, 'nyt_race_description'),
+            utils.make_field(self, 'accept_ap_calls'),
+            utils.make_field(self, 'nyt_called'),
+            utils.make_field(self, 'nyt_race_important')
+        ])
 
     @classmethod
     def create_override_races(cls):

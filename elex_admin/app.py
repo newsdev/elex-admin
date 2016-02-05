@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
 import argparse
+import csv
 import glob
 import json
+import io
 import os
 import re
 from sets import Set
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response, Response
 
 import models
 import utils
@@ -35,6 +37,30 @@ def race_list(racedate):
         context['states'].append(state_dict)
 
     return render_template('race_list.html', **context)
+
+@app.route('/elections/2016/admin/<racedate>/csv/<override>/', methods=['GET', 'POST'])
+def overrides_csv(racedate, override):
+    if request.method == 'GET':
+        output = ''
+
+        if override == 'race':
+            objs = [r.serialize() for r in models.OverrideRace.select()]
+
+        if override == 'candidate':
+            objs = [r.serialize() for r in models.OverrideCandidate.select()]
+
+        output = io.BytesIO()
+        fieldnames = [unicode(k) for k in objs[0].keys()]
+        writer = csv.DictWriter(output, fieldnames=list(fieldnames))
+        writer.writeheader()
+        writer.writerows(objs)
+        output = make_response(output.getvalue())
+        output.headers["Content-Disposition"] = "attachment; filename=override_%ss.csv" % override
+        output.headers["Content-type"] = "text/csv"
+        return output
+
+    if request.method == 'POST':
+        pass
 
 @app.route('/elections/2016/admin/<racedate>/state/<statepostal>/', methods=['POST'])
 def state_detail(racedate, statepostal):

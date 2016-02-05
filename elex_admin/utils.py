@@ -18,6 +18,9 @@ ELEX_RESULTS_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_results as
        LEFT JOIN override_races as o on r.raceid = o.race_raceid
 ;"""
 
+def make_field(cls, field_name):
+    return (field_name, getattr(cls, field_name))
+
 def update_views(database):
     """
     Resets the Postgres VIEWs.
