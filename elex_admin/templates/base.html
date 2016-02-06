@@ -42,7 +42,7 @@
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-bits">
-          <li><a data-toggle="modal" data-target="#overridesModal">Upload</a></li>
+          <li><a data-toggle="modal" data-target="#overridesModal" style="color: red;" href="#">Upload</a></li>
           <li><a href="/elections/2016/admin/{{ RACEDATE }}/csv/candidate/">Candidates</a></li>
           <li><a href="/elections/2016/admin/{{ RACEDATE }}/csv/race/">Races</a></li>
         </ul>
@@ -90,35 +90,45 @@
 
     <script type="text/javascript">
     $(function(){
-        var submit_override = function(data){
+        var submit_override = function(e){
+            e.preventDefault();
+
             var data = {}
+
             if ($('#candidate-file')[0].files.length > 0) {
                 var f = $('#candidate-file')[0].files[0]
                 var reader = new FileReader();
                 reader.readAsText(f);
-                reader.onload = function(e){
-                    data['candidates_text'] = e.target.result;
+                reader.onload = function(r){
+                    data['candidates_text'] = r.target.result;
                     $.ajax({
                         type: "POST",
                         url: '/elections/2016/admin/{{ RACEDATE }}/csv/',
                         data: data,
                         dataType: 'JSON',
-                        success: function(response){ console.log(response); }
+                        success: function(response){ 
+                            $('#overridesModal').modal('hide');
+                            $('#candidate-file').val('');
+                        }
                     });
                 }
             }
+
             if ($('#race-file')[0].files.length > 0) {
                 var f = $('#race-file')[0].files[0]
                 var reader = new FileReader();
                 reader.readAsText(f);
-                reader.onload = function(e){
-                    data['races_text'] = e.target.result;
+                reader.onload = function(r){
+                    data['races_text'] = r.target.result;
                     $.ajax({
                         type: "POST",
                         url: '/elections/2016/admin/{{ RACEDATE }}/csv/',
                         data: data,
                         dataType: 'JSON',
-                        success: function(response){ console.log(response); }
+                        success: function(response){
+                            $('#overridesModal').modal('hide');
+                            $('#race-file').val('');
+                        }
                     });
                 }
             }

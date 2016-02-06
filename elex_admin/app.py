@@ -52,11 +52,11 @@ def overrides_post(racedate):
             races_text = str(payload['races_text'][0])
 
         if races_text:
-            with open('../elex-loader/overrides/override_races.csv', 'w') as writefile:
+            with open('../elex-loader/overrides/%s_override_races.csv' % racedate, 'w') as writefile:
                 writefile.write(races_text)
 
         if candidates_text:
-            with open('../elex-loader/overrides/override_candidates.csv', 'w') as writefile:
+            with open('../elex-loader/overrides/%s_override_candidates.csv' % racedate, 'w') as writefile:
                 writefile.write(candidates_text)
 
         return json.dumps({"message": "success"})
