@@ -38,7 +38,30 @@ def race_list(racedate):
 
     return render_template('race_list.html', **context)
 
-@app.route('/elections/2016/admin/<racedate>/csv/<override>/', methods=['GET', 'POST'])
+@app.route('/elections/2016/admin/<racedate>/csv/', methods=['POST'])
+def overrides_post(racedate):
+    if request.method == 'POST':
+        payload = dict(request.form)
+        candidates_text = None
+        races_text = None
+
+        if payload.get('candidates_text', None):
+            candidates_text = str(payload['candidates_text'][0])
+
+        if payload.get('races_text', None):
+            races_text = str(payload['races_text'][0])
+
+        if races_text:
+            with open('../elex-loader/overrides/override_races.csv', 'w') as writefile:
+                writefile.write(races_text)
+
+        if candidates_text:
+            with open('../elex-loader/overrides/override_candidates.csv', 'w') as writefile:
+                writefile.write(candidates_text)
+
+        return json.dumps({"message": "success"})
+
+@app.route('/elections/2016/admin/<racedate>/csv/<override>/', methods=['GET'])
 def overrides_csv(racedate, override):
     if request.method == 'GET':
         output = ''
@@ -58,9 +81,6 @@ def overrides_csv(racedate, override):
         output.headers["Content-Disposition"] = "attachment; filename=override_%ss.csv" % override
         output.headers["Content-type"] = "text/csv"
         return output
-
-    if request.method == 'POST':
-        pass
 
 @app.route('/elections/2016/admin/<racedate>/state/<statepostal>/', methods=['POST'])
 def state_detail(racedate, statepostal):
