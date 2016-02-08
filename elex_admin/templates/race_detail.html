@@ -138,8 +138,6 @@
             data['nyt_race_name'] = $('#race-' + race_id + ' input.nyt_race_name').val()
             data['nyt_winner'] = $('#race-' + race_id + ' select.nyt_winner').val()
 
-            console.log(data);
-
             $.ajax({
                 type: "POST",
                 url: '/elections/2016/admin/{{ RACEDATE }}/race/' + race_id + '/',
@@ -193,6 +191,7 @@
             var candidate_id = $(this).val();
             var nyt_candidate_name = $('#candidate-' + candidate_id + ' input.candidate-name').val();
             var confirmation = null;
+
             if (!nyt_candidate_name && candidate_id === '') {
                 // Set no winner.
                 confirmation = confirm("Are you sure that you want to set no winner?");
