@@ -7,10 +7,10 @@ from fabric.state import env
 
 ENVIRONMENTS = {
     "prd": {
-        "hosts": [os.environ.get('ELEX_ADMIN_PRD_HOST', None)],
+        "hosts": 'ec2-23-23-220-64.compute-1.amazonaws.com',
     }, 
     "stg": {
-        "hosts": [os.environ.get('ELEX_ADMIN_STG_HOST', None)]
+        "hosts": 'ec2-107-20-172-193.compute-1.amazonaws.com',
     }
 }
 
@@ -76,7 +76,7 @@ def bounce(racedate=None):
 def candidates(racedate):
     if racedate:
         env.racedate = racedate
-    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && export RACEDATE=%(racedate)s && python elex_admin/initialize_racedate.py' % env)
+    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s-%(racedate)s && export RACEDATE=%(racedate)s && python elex_admin/initialize_racedate.py' % env)
 
 @api.task
 def deploy():
