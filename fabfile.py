@@ -76,7 +76,7 @@ def bounce(racedate=None):
 def candidates(racedate):
     if racedate:
         env.racedate = racedate
-    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s-%(racedate)s && export RACEDATE=%(racedate)s && python elex_admin/initialize_racedate.py' % env)
+    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && export RACEDATE=%(racedate)s && python elex_admin/initialize_racedate.py' % env)
 
 @api.task
 def deploy():
