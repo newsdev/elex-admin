@@ -75,7 +75,7 @@ def overrides_csv(racedate, override):
 
         output = io.BytesIO()
         fieldnames = [unicode(k) for k in objs[0].keys()]
-        writer = py2.CSVKitDictReader(output, fieldnames=list(fieldnames))
+        writer = py2.CSVKitDictWriter(output, fieldnames=list(fieldnames))
         writer.writeheader()
         writer.writerows(objs)
         output = make_response(output.getvalue())
