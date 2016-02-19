@@ -9,6 +9,7 @@ import os
 import re
 from sets import Set
 
+from csvkit import py2
 from flask import Flask, render_template, request, make_response, Response
 
 import models
@@ -74,7 +75,7 @@ def overrides_csv(racedate, override):
 
         output = io.BytesIO()
         fieldnames = [unicode(k) for k in objs[0].keys()]
-        writer = csv.DictWriter(output, fieldnames=list(fieldnames))
+        writer = py2.CSVKitDictReader(output, fieldnames=list(fieldnames))
         writer.writeheader()
         writer.writerows(objs)
         output = make_response(output.getvalue())
