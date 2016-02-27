@@ -22,7 +22,7 @@
     <div class="navbar navbar-default navbar-primary">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="/elections/2016/admin/">Elections 2016 <span style="color: rgb(51, 102, 0);">Admin</span></a>
+          <a class="navbar-brand" href="/elections/2016/admin/">Elections 2016 <span style="color: #388e3c;">Development Admin</span></a>
         </div>
         <ul class="nav navbar-nav navbar-left">
           <li class="navbar-summary">
@@ -31,7 +31,6 @@
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-bits">
-          <li><a>Admin</a></li>
           <li><a href="/elections/2016/loader/">Loader</a></li>
           <li><a href="/elections/2016/results/admin">Results</a></li>
         </ul>
@@ -144,12 +143,18 @@
         $('#upload-overrides').on('click', submit_override);
         if (window.location.hostname == 'int-elex-stg-east.newsdev.net'){
             $('.navbar-primary').css('border-bottom', '2px solid #ff5722');
+            $('a.navbar-brand span').css('color', '#ff5722');
+            $('a.navbar-brand span').html('Staging Admin');
         }
         if (window.location.hostname == 'int-elex-prd-east.newsdev.net'){
-            $('.navbar-primary').css('border-bottom', '2px solid #000000');
+            $('.navbar-primary').css('border-bottom', '2px solid #000');
+            $('a.navbar-brand span').css('color', '#000');
+            $('a.navbar-brand span').html('Production Admin');
         }
         if (window.location.hostname == 'int-elex-prd-west.newsdev.net'){
-            $('.navbar-primary').css('border-bottom', '2px solid #000000');
+            $('.navbar-primary').css('border-bottom', '2px solid #000');
+            $('a.navbar-brand span').css('color', '#000');
+            $('a.navbar-brand span').html('Prod-West Admin');
         }
     });
     </script>
