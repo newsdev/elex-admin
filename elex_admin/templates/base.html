@@ -13,7 +13,7 @@
             padding-bottom: 120px;
         }
         .navbar-primary {
-            border-bottom: 2px solid #009688;
+            border-bottom: 2px solid #388e3c;
         }
     </style>
   </head>
@@ -142,11 +142,14 @@
         };
 
         $('#upload-overrides').on('click', submit_override);
+        if (window.location.hostname == 'int-elex-stg-east.newsdev.net'){
+            $('.navbar-primary').css('border-bottom', '2px solid #ff5722');
+        }
         if (window.location.hostname == 'int-elex-prd-east.newsdev.net'){
-            $('.navbar-primary').css('border-bottom', '2px solid #f44336');
+            $('.navbar-primary').css('border-bottom', '2px solid #000000');
         }
         if (window.location.hostname == 'int-elex-prd-west.newsdev.net'){
-            $('.navbar-primary').css('border-bottom', '2px solid #e91e63');
+            $('.navbar-primary').css('border-bottom', '2px solid #000000');
         }
     });
     </script>
