@@ -19,7 +19,7 @@
 </table>
 
 
-<h1>Races</h1>
+<h2>President</h2>
 <table class="table">
 <tr>
     <th>State</th>
@@ -28,7 +28,7 @@
     <th>Type</th>
 </tr>
 
-{% for race in races %}
+{% for race in presidential_races %}
 <tr>
     <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
     <td>{{ race.party }}</td>
@@ -37,6 +37,45 @@
 </tr>
 {% endfor %}
 </table>
+
+<h2>National</h2>
+<table class="table">
+<tr>
+    <th>State</th>
+    <th>Party</th>
+    <th>Office</th>
+    <th>Type</th>
+</tr>
+
+{% for race in national_races %}
+<tr>
+    <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
+    <td>{{ race.party }}</td>
+    <td>{{ race.officename }}</td>
+    <td>{{ race.racetype }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<h2>Other / Local</h2>
+<table class="table">
+<tr>
+    <th>State</th>
+    <th>Party</th>
+    <th>Office</th>
+    <th>Type</th>
+</tr>
+
+{% for race in other_races %}
+<tr>
+    <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
+    <td>{{ race.party }}</td>
+    <td>{{ race.officename }}</td>
+    <td>{{ race.racetype }}</td>
+</tr>
+{% endfor %}
+</table>
+
 {% endblock %}
 
 {% block extrajs %}

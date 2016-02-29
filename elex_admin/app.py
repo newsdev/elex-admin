@@ -21,13 +21,31 @@ app.debug=True
 @app.route('/elections/2016/admin/<racedate>/')
 def race_list(racedate):
     context = utils.build_context(racedate)
-    context['races'] = models.ElexRace.select()
+    context['presidential_races'] = models.ElexRace\
+                                .select()\
+                                .where(
+                                    models.ElexRace.national == True, 
+                                    models.ElexRace.officeid == "P"
+                                )\
+                                .order_by(+models.ElexRace.statepostal)
+
+    context['national_races'] = models.ElexRace\
+                                .select()\
+                                .where(
+                                    models.ElexRace.national == True,
+                                    models.ElexRace.officeid << ["G","S","H"]
+                                )\
+                                .order_by(+models.ElexRace.statepostal)
+    context['other_races'] = models.ElexRace\
+                                .select()\
+                                .where(
+                                    ~(models.ElexRace.id << context['national_races']), 
+                                    ~(models.ElexRace.id << context['presidential_races']), 
+                                )\
+                                .order_by(+models.ElexRace.statepostal)
     context['states'] = []
 
-    state_list = []
-    for race in context['races']:
-        state_list.append(race.statepostal)
-    state_list = list(Set(state_list))
+    state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
 
     for state in state_list:
         race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
