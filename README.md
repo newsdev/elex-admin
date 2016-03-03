@@ -24,3 +24,5 @@ export ELEX_ADMIN_CDN_URL=http://my.cdn.url.s3.amazonaws.com/cdn
 ```
 python -m elex_admin.app
 ```
+
+![screenshot](https://cloud.githubusercontent.com/assets/109988/13506676/3c69d384-e14d-11e5-898e-e2b91ba1c38d.png)
