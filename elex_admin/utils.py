@@ -105,5 +105,5 @@ def build_context(racedate):
     context = {}
     context['CDN_URL'] = CDN_URL
     context['RACEDATE'] = racedate
-    context['race_dates'] = [d.split('/')[-1].split('.ini')[0] for d in glob.glob('elex_admin/*.ini')]
+    context['race_dates'] = sorted([d.split('/')[-1].split('.ini')[0] for d in glob.glob('elex_admin/*.ini')], key=lambda x:x)
     return dict(context)
