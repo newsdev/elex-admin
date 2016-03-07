@@ -59,7 +59,7 @@ def race_list(racedate):
 
 @app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
 def scripts(racedate, script_type):
-    base_command = 'source /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
+    base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
     if request.method == 'GET':
         o = "1"
         if script_type == 'zeroes':
