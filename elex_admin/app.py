@@ -124,6 +124,18 @@ def race_detail(racedate, raceid):
         if len(ap_winner) > 0:
             context['ap_winner'] = ap_winner[0]
 
+        context['states'] = []
+
+        state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+
+        for state in state_list:
+            race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
+            state_dict = {}
+            state_dict['statepostal'] = state
+            state_dict['report'] = race.report
+            state_dict['report_description'] = race.report_description
+            context['states'].append(state_dict)
+
         return render_template('race_detail.html', **context)
 
     if request.method == 'POST':

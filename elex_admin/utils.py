@@ -1,3 +1,4 @@
+import glob
 import os
 
 CDN_URL = os.environ.get('ELEX_ADMIN_CDN_URL', 'http://int.nyt.com.s3.amazonaws.com/cdn')
@@ -104,4 +105,5 @@ def build_context(racedate):
     context = {}
     context['CDN_URL'] = CDN_URL
     context['RACEDATE'] = racedate
+    context['race_dates'] = [d.split('/')[-1].split('.ini')[0] for d in glob.glob('elex_admin/*.ini')]
     return dict(context)

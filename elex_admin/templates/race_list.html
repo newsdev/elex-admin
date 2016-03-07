@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>States</h1>
+<h1 style="margin-bottom:40px;">{{ RACEDATE }} {% for state in states %}{{ state.statepostal }} {% endfor %}</h1>
+
+<h3>States</h3>
 <table class="table">
 <tr>
     <th>State</th>
@@ -19,7 +21,7 @@
 </table>
 
 
-<h2>President</h2>
+<h3>President</h3>
 <table class="table">
 <tr>
     <th>State</th>
@@ -38,7 +40,7 @@
 {% endfor %}
 </table>
 
-<h2>National</h2>
+<h3>National</h3>
 <table class="table">
 <tr>
     <th>State</th>
@@ -57,7 +59,7 @@
 {% endfor %}
 </table>
 
-<h2>Other / Local</h2>
+<h3>Other / Local</h3>
 <table class="table">
 <tr>
     <th>State</th>

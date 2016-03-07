@@ -22,17 +22,28 @@
     <div class="navbar navbar-default navbar-primary">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="/elections/2016/admin/">Elections 2016 <span style="color: #388e3c;">Development Admin</span></a>
+          <a class="navbar-brand" href="/elections/2016/admin/">Elections 2016 <span style="color: #388e3c;">Dev Admin</span></a>
         </div>
         <ul class="nav navbar-nav navbar-left">
           <li class="navbar-summary">
             <span style="color: #333;font-weight:400;font-family: nyt-franklin;">
-                Administrative interface for 2016 Election data</span>
+                2016 Election data</span>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-bits">
           <li><a href="/elections/2016/loader/">Loader</a></li>
-          <li><a href="/elections/2016/results/admin">Results</a></li>
+          <li>
+            <ul class="nav navbar-nav navbar-right">
+              <li id="fat-menu" class="dropdown">
+                <a id="drop3" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Race dates<span class="caret"></span></a>
+                <ul class="dropdown-menu" aria-labelledby="drop3">
+                  {% for r in race_dates %}
+                    {% if r == RACEDATE %}<li class="disabled"><a href="#">{% else %}<li><a href="/elections/2016/admin/{{ r }}/">{% endif %}{{ r }}</a></li>
+                  {% endfor %}
+                </ul>
+              </li>
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
@@ -144,12 +155,12 @@
         if (window.location.hostname == 'int-elex-stg-east.newsdev.net'){
             $('.navbar-primary').css('border-bottom', '2px solid #ff5722');
             $('a.navbar-brand span').css('color', '#ff5722');
-            $('a.navbar-brand span').html('Staging Admin');
+            $('a.navbar-brand span').html('Stg Admin');
         }
         if (window.location.hostname == 'int-elex-prd-east.newsdev.net'){
             $('.navbar-primary').css('border-bottom', '2px solid #000');
             $('a.navbar-brand span').css('color', '#000');
-            $('a.navbar-brand span').html('Production Admin');
+            $('a.navbar-brand span').html('Prod Admin');
         }
         if (window.location.hostname == 'int-elex-prd-west.newsdev.net'){
             $('.navbar-primary').css('border-bottom', '2px solid #000');

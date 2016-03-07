@@ -11,14 +11,8 @@
         background-color: #efefef;
     }
 </style>
-<div class="row">
-    <div class="col-md-12">
-        <h1>
-            {{ RACEDATE }}
-            <small id="target-nyt_race_name">{% if race.nyt_race_name %}{{ race.nyt_race_name }}{% else %}{{ race }}{% endif %}</small>
-        </h1>
-    </div>
-</div>
+
+<h1 style="margin-bottom:40px;">{{ RACEDATE }} {% for state in states %}{{ state.statepostal }} {% endfor %}</h1>
 
 {% if race.nyt_race_description %}
 <div class="row" style="margin:15px 0;">
@@ -109,12 +103,10 @@
 {% block extrajs %}
 <script type="text/javascript">
     $(function(){
-        var update_race_text = function(data, race_id){
+        var update_race_inputs = function(data, race_id){
             /*
                 Update the static text for a race when it is changed.
             */
-            $('#target-nyt_race_description').text(data['nyt_race_description']);
-            $('#target-nyt_race_name').text(data['nyt_race_name']);
             var winner = data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
             if (winner) {
                 $('#race-' + race_id + ' select.nyt_winner').prop('disabled', true);
@@ -142,7 +134,7 @@
                 type: "POST",
                 url: '/elections/2016/admin/{{ RACEDATE }}/race/' + race_id + '/',
                 data: data,
-                success: function(response){ update_race_text(data,race_id); },
+                success: function(response){ update_race_inputs(data,race_id); },
                 dataType: 'JSON'
             });
         };
