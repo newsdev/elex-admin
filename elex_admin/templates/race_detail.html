@@ -12,7 +12,12 @@
     }
 </style>
 
-<h1 style="margin-bottom:40px;">{{ RACEDATE }} {% for state in states %}{{ state.statepostal }} {% endfor %}</h1>
+<div class="row">
+    <div class="col-md-12">
+        <h1 style="margin-bottom:40px;">{{ RACEDATE }} {% for state in states %}{{ state.statepostal }} {% endfor %}</h1>
+    </div>
+</div>
+
 
 {% if race.nyt_race_description %}
 <div class="row" style="margin:15px 0;">

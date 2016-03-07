@@ -1,88 +1,145 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 style="margin-bottom:40px;">{{ RACEDATE }} {% for state in states %}{{ state.statepostal }} {% endfor %}</h1>
+<div id="alert-holder"></div>
 
-<h3>States</h3>
-<table class="table">
-<tr>
-    <th>State</th>
-    <th>Reporting?</th>
-    <th>Description</th>
-</tr>
+<div class="row" style="margin-bottom:20px;">
+    <div class="col-md-12">
+        <h1>{{ RACEDATE }} {% for state in states %}{{ state.statepostal }} {% endfor %}</h1>
+    </div>
+</div>
 
-{% for state in states %}
-<tr id="state-{{ state.statepostal }}">
-    <td>{{ state.statepostal }}</td>
-    <td><input class="state-report-toggle" data-state="{{ state.statepostal }}" type="checkbox" {% if state.report %}checked {% endif%}data-toggle="toggle" data-onstyle="success"></td>
-    <td><textarea data-state="{{ state.statepostal }}" class="form-control report-description" name="report_description">{% if state.report_description %}{{ state.report_description }}{% endif %}</textarea></td>
-</tr>
-{% endfor %}
-</table>
+<div class="row" style="margin-bottom:30px;">
+    <div class="col-md-12">
+        <button class="btn btn-large btn-default script" data-script="zeroes"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>&nbsp;&nbsp;Zeroes</button>
 
+        <button class="btn btn-large btn-default script" data-script="delegates"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;&nbsp;Delegates</button>
 
-<h3>President</h3>
-<table class="table">
-<tr>
-    <th>State</th>
-    <th>Party</th>
-    <th>Office</th>
-    <th>Type</th>
-</tr>
+        <button class="btn btn-large btn-default disabled" data-script="bake"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Bake</button>
+    </div>
+</div>
 
-{% for race in presidential_races %}
-<tr>
-    <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
-    <td>{{ race.party }}</td>
-    <td>{{ race.officename }}</td>
-    <td>{{ race.racetype }}</td>
-</tr>
-{% endfor %}
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <h3>States</h3>
+        <table class="table">
+        <tr>
+            <th>State</th>
+            <th>Reporting?</th>
+            <th>Description</th>
+        </tr>
 
-<h3>National</h3>
-<table class="table">
-<tr>
-    <th>State</th>
-    <th>Party</th>
-    <th>Office</th>
-    <th>Type</th>
-</tr>
+        {% for state in states %}
+        <tr id="state-{{ state.statepostal }}">
+            <td>{{ state.statepostal }}</td>
+            <td><input class="state-report-toggle" data-state="{{ state.statepostal }}" type="checkbox" {% if state.report %}checked {% endif%}data-toggle="toggle" data-onstyle="success"></td>
+            <td><textarea data-state="{{ state.statepostal }}" class="form-control report-description" name="report_description">{% if state.report_description %}{{ state.report_description }}{% endif %}</textarea></td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
 
-{% for race in national_races %}
-<tr>
-    <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
-    <td>{{ race.party }}</td>
-    <td>{{ race.officename }}</td>
-    <td>{{ race.racetype }}</td>
-</tr>
-{% endfor %}
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <h3>President</h3>
+        <table class="table">
+        <tr>
+            <th>State</th>
+            <th>Party</th>
+            <th>Office</th>
+            <th>Type</th>
+        </tr>
 
-<h3>Other / Local</h3>
-<table class="table">
-<tr>
-    <th>State</th>
-    <th>Party</th>
-    <th>Office</th>
-    <th>Type</th>
-</tr>
+        {% for race in presidential_races %}
+        <tr>
+            <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
+            <td>{{ race.party }}</td>
+            <td>{{ race.officename }}</td>
+            <td>{{ race.racetype }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
 
-{% for race in other_races %}
-<tr>
-    <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
-    <td>{{ race.party }}</td>
-    <td>{{ race.officename }}</td>
-    <td>{{ race.racetype }}</td>
-</tr>
-{% endfor %}
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <h3>National</h3>
+        <table class="table">
+        <tr>
+            <th>State</th>
+            <th>Party</th>
+            <th>Office</th>
+            <th>Type</th>
+        </tr>
+
+        {% for race in national_races %}
+        <tr>
+            <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
+            <td>{{ race.party }}</td>
+            <td>{{ race.officename }}</td>
+            <td>{{ race.racetype }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Other / Local</h3>
+        <table class="table">
+        <tr>
+            <th>State</th>
+            <th>Party</th>
+            <th>Office</th>
+            <th>Type</th>
+        </tr>
+
+        {% for race in other_races %}
+        <tr>
+            <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.id }}/">{{ race.statepostal }}</a></td>
+            <td>{{ race.party }}</td>
+            <td>{{ race.officename }}</td>
+            <td>{{ race.racetype }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block extrajs %}
 <script type="text/javascript">
     $(function(){
+        var pop_alert = function(message, script_type){
+            /*
+                Message should have a key "output" that is a string.
+            */
+            message_text = "Failed; please check the logs."
+            if (message.output == "0") {
+                message_text = "Success."
+            }
+            var alert_text = '<div class="alert alert-danger" role="alert">Script <strong>'+ script_type + '</strong>: ' + message_text + ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+            $('#alert-holder').html(alert_text);
+            if (message.output == "0") {
+                $('#alert-holder .alert').removeClass('alert-danger').addClass('alert-success')
+            }
+        }
+        var run_server_script = function(data){
+            /*
+                Hit the route for running one of these three server scripts.
+            */
+            var script_type = $(this).attr('data-script');
+            $.ajax({
+                type: "GET",
+                url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
+                success: function(response){ pop_alert(response, script_type) },
+                dataType: 'JSON'
+            });
+        }
         var submit_state = function(data){
             /*
                 Submit the current state of a race in the form.
@@ -104,8 +161,9 @@
             });
         };
 
-        $('textarea.report-description').on('change', submit_state)
+        $('textarea.report-description').on('change', submit_state);
         $('input.state-report-toggle').on('change', submit_state);
+        $('button.script').on('click', run_server_script);
     });
 </script>
 {% endblock %}

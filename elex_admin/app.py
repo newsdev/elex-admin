@@ -57,6 +57,22 @@ def race_list(racedate):
 
     return render_template('race_list.html', **context)
 
+@app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
+def scripts(racedate, script_type):
+    base_command = 'source /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
+    if request.method == 'GET':
+        o = "1"
+        if script_type == 'zeroes':
+            o = os.system('%s./scripts/prd/reload.sh %s' % (base_command, racedate))
+
+        if script_type == 'bake':
+            pass
+
+        if script_type == 'delegates':
+            o = os.system('%s./scripts/prd/delegates.sh %s' % (base_command, racedate))
+
+        return json.dumps({"message": "success", "output": o})
+
 @app.route('/elections/2016/admin/<racedate>/csv/', methods=['POST'])
 def overrides_post(racedate):
     if request.method == 'POST':
