@@ -24,3 +24,8 @@ export ELEX_ADMIN_CDN_URL=http://my.cdn.url.s3.amazonaws.com/cdn
 ```
 python -m elex_admin.app
 ```
+## See all races for a racedate
+![screenshot](https://cloud.githubusercontent.com/assets/109988/13506676/3c69d384-e14d-11e5-898e-e2b91ba1c38d.png)
+
+## Edit candidate information and make race calls
+![screenshot](https://cloud.githubusercontent.com/assets/109988/13506720/7f125e5e-e14d-11e5-930b-d6f66008f300.png)
