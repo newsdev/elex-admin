@@ -8,6 +8,7 @@ import io
 import os
 import re
 from sets import Set
+import datetime
 
 from csvkit import py2
 from flask import Flask, render_template, request, make_response, Response
@@ -21,7 +22,17 @@ app.debug=True
 @app.route('/elections/2016/admin/<racedate>/archive/')
 def archive_list(racedate):
     context = utils.build_context(racedate)
-    context['files'] = sorted([f.split('/')[-1] for f in glob.glob('/tmp/%s/*.json' % racedate)], key=lambda x:x, reverse=True)[:100]
+    context['files'] = sorted(
+        [
+            {
+                "name": f.split('/')[-1],
+                "date": datetime.datetime.fromtimestamp(float(f.split('/')[-1].split('-')[-1].split('.json')[0]))
+            }
+            for f in glob.glob('/tmp/%s/*.json' % racedate)
+        ],
+        key=lambda x:x,
+        reverse=True
+    )[:100]
 
     context['states'] = []
 

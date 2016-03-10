@@ -39,15 +39,22 @@
 <div class="row" style="margin-bottom:20px;">
     <div class="col-md-12">
         <h3>Archived files</h1>
+        <table class="table">
+        <tr>
+            <th>Index</th>
+            <th>Time</th>
+            <th>File</th>
+        </tr>
+        {% for f in files %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ f.date }}</td>
+            <td><a href="/elections/2016/admin/{{ RACEDATE }}/archive/{{ f.name }}">{{ f.name }}</a></td>
+        </tr>
+        {% endfor %}
+        </table>
     </div>
 </div>
-{% for f in files %}
-<div class="row">
-    <div class="col-md-12">
-        <a href="/elections/2016/admin/{{ RACEDATE }}/archive/{{ f }}">{{ f }}</a><br/>
-    </div>
-</div>
-{% endfor %}
 
 
 {% endblock %}
