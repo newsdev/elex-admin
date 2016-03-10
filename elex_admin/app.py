@@ -18,6 +18,18 @@ import utils
 app = Flask(__name__)
 app.debug=True
 
+@app.route('/elections/2016/admin/<racedate>/archive/')
+def archive_list(racedate):
+    context = utils.build_context(racedate)
+    context['files'] = sorted([f.split('/')[-1] for f in glob.glob('/tmp/%s/*.json' % racedate)], key=lambda x:x, reverse=True)[:25]
+
+    return render_template('archive_list.html', **context)
+
+@app.route('/elections/2016/admin/<racedate>/archive/<filename>')
+def archive_detail(racedate, filename):
+    with open('/tmp/%s/%s' % (racedate, filename), 'r') as readfile:
+        return readfile.read()
+
 @app.route('/elections/2016/admin/<racedate>/')
 def race_list(racedate):
     context = utils.build_context(racedate)

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for f in files %}
+<a href="/elections/2016/admin/{{ RACEDATE }}/archive/{{ f }}">{{ f }}</a><br/>
+{% endfor %}
+
+{% endblock %}
