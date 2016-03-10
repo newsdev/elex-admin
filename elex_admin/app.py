@@ -67,14 +67,11 @@ def scripts(racedate, script_type):
     base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
     if request.method == 'GET':
         o = "1"
-        if script_type == 'zeroes':
-            o = os.system('%s./scripts/prd/reload.sh %s' % (base_command, racedate))
 
         if script_type == 'bake':
             pass
-
-        if script_type == 'delegates':
-            o = os.system('%s./scripts/prd/delegates.sh %s' % (base_command, racedate))
+        else:
+            o = os.system('%s./scripts/prd/%s.sh %s' % (base_command, script_type, racedate))
 
         return json.dumps({"message": "success", "output": o})
 
