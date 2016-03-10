@@ -32,7 +32,7 @@ def archive_list(racedate):
         ],
         key=lambda x:x,
         reverse=True
-    )[:100]
+    )[:750]
 
     context['states'] = []
 
