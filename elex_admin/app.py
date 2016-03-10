@@ -21,6 +21,11 @@ app.debug=True
 @app.route('/elections/2016/admin/<racedate>/')
 def race_list(racedate):
     context = utils.build_context(racedate)
+    context['timeout'] = os.environ.get('ELEX_LOADER_TIMEOUT', '30')
+    if os.path.isfile('/tmp/elex_loader_timeout.sh'):
+        with open('/tmp/elex_loader_timeout.sh') as readfile:
+            context['timeout'] = readfile.read().split('=')[1].strip()
+
     context['presidential_races'] = models.ElexRace\
                                 .select()\
                                 .where(
@@ -195,6 +200,16 @@ def candidate_detail(racedate, candidateid):
 
         utils.update_model(oc, payload)
         utils.update_views(models.database)
+
+        return json.dumps({"message": "success"})
+
+@app.route('/elections/2016/admin/<racedate>/loader/timeout/', methods=['POST'])
+def set_loader_timeout(racedate):
+    if request.method == 'POST':
+        payload = utils.clean_payload(dict(request.form))
+
+        timeout = payload.get('timeout', '')
+        os.system('echo export ELEX_LOADER_TIMEOUT=%s > /tmp/elex_loader_timeout.sh' % timeout)
 
         return json.dumps({"message": "success"})
 

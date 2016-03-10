@@ -10,12 +10,22 @@
 </div>
 
 <div class="row" style="margin-bottom:30px;">
-    <div class="col-md-12">
+    <div class="col-md-10">
         <button class="btn btn-large btn-default script" data-script="zeroes"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>&nbsp;&nbsp;Zeroes</button>
 
         <button class="btn btn-large btn-default script" data-script="delegates"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;&nbsp;Delegates</button>
 
         <button class="btn btn-large btn-default disabled" data-script="bake"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Bake</button>
+    </div>
+    <div class="col-md-2">
+        <div class="input-group">
+          <input id="value-timeout" type="text" class="form-control" value="{{ timeout }}">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="set-timeout">
+                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>&nbsp;Set
+            </button>
+          </span>
+        </div><!-- /input-group -->
     </div>
 </div>
 
@@ -140,6 +150,18 @@
                 dataType: 'JSON'
             });
         }
+        var set_loader_timeout = function(data){
+            var timeout = $('#value-timeout').val();
+            data = {};
+            data['timeout'] = timeout;
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/elections/2016/admin/{{ RACEDATE }}/loader/timeout/',
+                success: function(response){ },
+                dataType: 'JSON'
+            })
+        }
         var submit_state = function(data){
             /*
                 Submit the current state of a race in the form.
@@ -164,6 +186,7 @@
         $('textarea.report-description').on('change', submit_state);
         $('input.state-report-toggle').on('change', submit_state);
         $('button.script').on('click', run_server_script);
+        $('#set-timeout').on('click', set_loader_timeout);
     });
 </script>
 {% endblock %}
