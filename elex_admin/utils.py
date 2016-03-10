@@ -106,4 +106,8 @@ def build_context(racedate):
     context['CDN_URL'] = CDN_URL
     context['RACEDATE'] = racedate
     context['race_dates'] = sorted([d.split('/')[-1].split('.ini')[0] for d in glob.glob('elex_admin/*.ini')], key=lambda x:x)
+    context['timeout'] = os.environ.get('ELEX_LOADER_TIMEOUT', '30')
+    if os.path.isfile('/tmp/elex_loader_timeout.sh'):
+        with open('/tmp/elex_loader_timeout.sh') as readfile:
+            context['timeout'] = readfile.read().split('=')[1].strip()
     return dict(context)

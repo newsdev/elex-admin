@@ -21,7 +21,19 @@ app.debug=True
 @app.route('/elections/2016/admin/<racedate>/archive/')
 def archive_list(racedate):
     context = utils.build_context(racedate)
-    context['files'] = sorted([f.split('/')[-1] for f in glob.glob('/tmp/%s/*.json' % racedate)], key=lambda x:x, reverse=True)[:25]
+    context['files'] = sorted([f.split('/')[-1] for f in glob.glob('/tmp/%s/*.json' % racedate)], key=lambda x:x, reverse=True)[:100]
+
+    context['states'] = []
+
+    state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+
+    for state in state_list:
+        race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
+        state_dict = {}
+        state_dict['statepostal'] = state
+        state_dict['report'] = race.report
+        state_dict['report_description'] = race.report_description
+        context['states'].append(state_dict)
 
     return render_template('archive_list.html', **context)
 
@@ -33,11 +45,6 @@ def archive_detail(racedate, filename):
 @app.route('/elections/2016/admin/<racedate>/')
 def race_list(racedate):
     context = utils.build_context(racedate)
-    context['timeout'] = os.environ.get('ELEX_LOADER_TIMEOUT', '30')
-    if os.path.isfile('/tmp/elex_loader_timeout.sh'):
-        with open('/tmp/elex_loader_timeout.sh') as readfile:
-            context['timeout'] = readfile.read().split('=')[1].strip()
-
     context['presidential_races'] = models.ElexRace\
                                 .select()\
                                 .where(
