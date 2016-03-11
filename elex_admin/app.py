@@ -194,36 +194,46 @@ def state_detail(racedate, statepostal):
 
 @app.route('/elections/2016/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
 def race_detail(racedate, raceid):
-    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-    )
-    models.database_proxy.initialize(racedate_db)
     if request.method == 'GET':
-        context = utils.build_context(racedate)
-        context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid)
-        context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(int(raceid))), key=lambda x:x.nyt_display_order)
+        try:
+            racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+                    user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+                    host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+            )
+            models.database_proxy.initialize(racedate_db)
+            context = utils.build_context(racedate)
+            context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid)
+            context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(int(raceid))), key=lambda x:x.nyt_display_order)
 
-        context['ap_winner'] = None
-        ap_winner = models.ElexResult.select().where(models.ElexResult.raceid == raceid, models.ElexResult.winner == True)
-        if len(ap_winner) > 0:
-            context['ap_winner'] = ap_winner[0]
+            context['ap_winner'] = None
+            ap_winner = models.ElexResult.select().where(models.ElexResult.raceid == raceid, models.ElexResult.winner == True)
+            if len(ap_winner) > 0:
+                context['ap_winner'] = ap_winner[0]
 
-        context['states'] = []
+            context['states'] = []
 
-        state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+            state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
 
-        for state in state_list:
-            race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
-            state_dict = {}
-            state_dict['statepostal'] = state
-            state_dict['report'] = race.report
-            state_dict['report_description'] = race.report_description
-            context['states'].append(state_dict)
+            for state in state_list:
+                race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
+                state_dict = {}
+                state_dict['statepostal'] = state
+                state_dict['report'] = race.report
+                state_dict['report_description'] = race.report_description
+                context['states'].append(state_dict)
 
-        return render_template('race_detail.html', **context)
+            return render_template('race_detail.html', **context)
+
+        except peewee.OperationalError, e:
+            context['error'] = e
+            return render_template('error.html', **context)
 
     if request.method == 'POST':
+        racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+            user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+            host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+        )
+        models.database_proxy.initialize(racedate_db)
         payload = utils.clean_payload(dict(request.form))
         try:
             r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid)
