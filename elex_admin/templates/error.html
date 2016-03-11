@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="alert-holder"></div>
+
+<div class="row" style="margin-bottom:20px;">
+    <div class="col-md-12">
+        <h1>{{ RACEDATE }}</h1>
+    </div>
+</div>
+
+<div class="row" style="margin-bottom:30px;">
+    <div class="col-md-10">
+        <button class="btn btn-large btn-default script" data-script="reload"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>&nbsp;&nbsp;Reload</button>
+
+        <button class="btn btn-large btn-default script" data-script="delegates"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;&nbsp;Delegates</button>
+
+        <button class="btn btn-large btn-default script" data-script="update"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;&nbsp;Update</button>
+
+        <button class="btn btn-large btn-default disabled" data-script="bake"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Bake</button>
+    </div>
+    <div class="col-md-2">
+        <div class="input-group">
+          <input id="value-timeout" type="text" class="form-control" value="{{ timeout }}">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="set-timeout">
+                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>&nbsp;Set
+            </button>
+          </span>
+        </div><!-- /input-group -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Error</h2>
+    </div>
+</div>
+
+<div class="row" style="margin-bottom:20px;">
+    <div class="col-md-12">
+        <code>
+            <pre>
+                {{ error }}
+            </pre>
+        </code>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+    $(function(){
+        var pop_alert = function(message, script_type){
+            /*
+                Message should have a key "output" that is a string.
+            */
+            message_text = "Failed; please check the logs."
+            if (message.output == "0") {
+                message_text = "Success."
+            }
+            var alert_text = '<div class="alert alert-danger" role="alert">Script <strong>'+ script_type + '</strong>: ' + message_text + ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+            $('#alert-holder').html(alert_text);
+            if (message.output == "0") {
+                $('#alert-holder .alert').removeClass('alert-danger').addClass('alert-success')
+            }
+        }
+        var run_server_script = function(data){
+            /*
+                Hit the route for running one of these three server scripts.
+            */
+            var script_type = $(this).attr('data-script');
+            $.ajax({
+                type: "GET",
+                url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
+                success: function(response){ pop_alert(response, script_type) },
+                dataType: 'JSON'
+            });
+        }
+        var set_loader_timeout = function(data){
+            var timeout = $('#value-timeout').val();
+            data = {};
+            data['timeout'] = timeout;
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/elections/2016/admin/{{ RACEDATE }}/loader/timeout/',
+                success: function(response){ },
+                dataType: 'JSON'
+            })
+        }
+        var submit_state = function(data){
+            /*
+                Submit the current state of a race in the form.
+            */
+            var statepostal = $(this).attr('data-state');
+            var data = {};
+
+            data['report'] = $('#state-' + statepostal + ' input.state-report-toggle').prop('checked');
+            data['report_description'] = $('#state-' + statepostal + ' textarea.report-description').val()
+
+            console.log(data);
+
+            $.ajax({
+                type: "POST",
+                url: '/elections/2016/admin/{{ RACEDATE }}/state/' + statepostal + '/',
+                data: data,
+                success: function(response){  },
+                dataType: 'JSON'
+            });
+        };
+
+        $('textarea.report-description').on('change', submit_state);
+        $('input.state-report-toggle').on('change', submit_state);
+        $('button.script').on('click', run_server_script);
+        $('#set-timeout').on('click', set_loader_timeout);
+    });
+</script>
+{% endblock %}

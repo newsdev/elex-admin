@@ -6,15 +6,12 @@ from playhouse.postgres_ext import *
 
 import utils
 
-database = PostgresqlExtDatabase('elex_%s' % os.environ.get('RACEDATE', None),
-            user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-            host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-)
 
+database_proxy = Proxy()
 
 class BaseModel(Model):
     class Meta:
-        database = database
+        database = database_proxy
 
 
 class OverrideCandidate(BaseModel):

@@ -12,6 +12,9 @@ import datetime
 
 from csvkit import py2
 from flask import Flask, render_template, request, make_response, Response
+import peewee
+from peewee import *
+from playhouse.postgres_ext import *
 
 import models
 import utils
@@ -21,6 +24,11 @@ app.debug=True
 
 @app.route('/elections/2016/admin/<racedate>/archive/')
 def archive_list(racedate):
+    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+    )
+    models.database_proxy.initialize(racedate_db)
     context = utils.build_context(racedate)
     context['files'] = sorted(
         [
@@ -56,41 +64,55 @@ def archive_detail(racedate, filename):
 @app.route('/elections/2016/admin/<racedate>/')
 def race_list(racedate):
     context = utils.build_context(racedate)
-    context['presidential_races'] = models.ElexRace\
-                                .select()\
-                                .where(
-                                    models.ElexRace.national == True, 
-                                    models.ElexRace.officeid == "P"
-                                )\
-                                .order_by(+models.ElexRace.statepostal)
-
-    context['national_races'] = models.ElexRace\
-                                .select()\
-                                .where(
-                                    models.ElexRace.national == True,
-                                    models.ElexRace.officeid << ["G","S","H"]
-                                )\
-                                .order_by(+models.ElexRace.statepostal)
-    context['other_races'] = models.ElexRace\
-                                .select()\
-                                .where(
-                                    ~(models.ElexRace.id << context['national_races']), 
-                                    ~(models.ElexRace.id << context['presidential_races']), 
-                                )\
-                                .order_by(+models.ElexRace.statepostal)
+    context['presidential_races'] = []
+    context['national_races'] = []
+    context['other_races'] = []
     context['states'] = []
 
-    state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+    try:
+        racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+                user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+                host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+        )
+        models.database_proxy.initialize(racedate_db)
+        context['presidential_races'] = models.ElexRace\
+                                    .select()\
+                                    .where(
+                                        models.ElexRace.national == True, 
+                                        models.ElexRace.officeid == "P"
+                                    )\
+                                    .order_by(+models.ElexRace.statepostal)
 
-    for state in state_list:
-        race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
-        state_dict = {}
-        state_dict['statepostal'] = state
-        state_dict['report'] = race.report
-        state_dict['report_description'] = race.report_description
-        context['states'].append(state_dict)
+        context['national_races'] = models.ElexRace\
+                                    .select()\
+                                    .where(
+                                        models.ElexRace.national == True,
+                                        models.ElexRace.officeid << ["G","S","H"]
+                                    )\
+                                    .order_by(+models.ElexRace.statepostal)
+        context['other_races'] = models.ElexRace\
+                                    .select()\
+                                    .where(
+                                        ~(models.ElexRace.id << context['national_races']), 
+                                        ~(models.ElexRace.id << context['presidential_races']), 
+                                    )\
+                                    .order_by(+models.ElexRace.statepostal)
 
-    return render_template('race_list.html', **context)
+        state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+
+        for state in state_list:
+            race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
+            state_dict = {}
+            state_dict['statepostal'] = state
+            state_dict['report'] = race.report
+            state_dict['report_description'] = race.report_description
+            context['states'].append(state_dict)
+
+        return render_template('race_list.html', **context)
+
+    except peewee.OperationalError, e:
+        context['error'] = e
+        return render_template('error.html', **context)
 
 @app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
 def scripts(racedate, script_type):
@@ -130,6 +152,11 @@ def overrides_post(racedate):
 
 @app.route('/elections/2016/admin/<racedate>/csv/<override>/', methods=['GET'])
 def overrides_csv(racedate, override):
+    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+    )
+    models.database_proxy.initialize(racedate_db)
     if request.method == 'GET':
         output = ''
 
@@ -151,6 +178,11 @@ def overrides_csv(racedate, override):
 
 @app.route('/elections/2016/admin/<racedate>/state/<statepostal>/', methods=['POST'])
 def state_detail(racedate, statepostal):
+    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+    )
+    models.database_proxy.initialize(racedate_db)
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
         races = [r.raceid for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
@@ -162,6 +194,11 @@ def state_detail(racedate, statepostal):
 
 @app.route('/elections/2016/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
 def race_detail(racedate, raceid):
+    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+    )
+    models.database_proxy.initialize(racedate_db)
     if request.method == 'GET':
         context = utils.build_context(racedate)
         context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid)
@@ -202,6 +239,11 @@ def race_detail(racedate, raceid):
 
 @app.route('/elections/2016/admin/<racedate>/candidateorder/', methods=['POST'])
 def candidate_order(racedate):
+    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+    )
+    models.database_proxy.initialize(racedate_db)
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
 
@@ -217,6 +259,11 @@ def candidate_order(racedate):
 
 @app.route('/elections/2016/admin/<racedate>/candidate/<candidateid>/', methods=['POST'])
 def candidate_detail(racedate, candidateid):
+    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+    )
+    models.database_proxy.initialize(racedate_db)
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
 
