@@ -1,5 +1,8 @@
 import models
 
+from peewee import *
+from playhouse.postgres_ext import *
+
 if __name__ == "__main__":
     racedate_db = PostgresqlExtDatabase('elex_%s' % os.environ.get('RACEDATE', None),
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
