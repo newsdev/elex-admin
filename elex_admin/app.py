@@ -188,7 +188,7 @@ def state_detail(racedate, statepostal):
         races = [r.raceid for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
         r = models.OverrideRace.update(report=payload['report'], report_description=payload['report_description']).where(models.OverrideRace.race_raceid << races)
         r.execute()
-        utils.update_views(models.database)
+        utils.update_views(models.database_proxy)
 
         return json.dumps({"message": "success"})
 
@@ -243,7 +243,7 @@ def race_detail(racedate, raceid):
         utils.set_winner(payload['nyt_winner'], raceid)
 
         utils.update_model(r, payload)
-        utils.update_views(models.database)
+        utils.update_views(models.database_proxy)
 
         return json.dumps({"message": "success"})
 
@@ -263,7 +263,7 @@ def candidate_order(racedate):
                 oc = models.OverrideCandidate.update(nyt_display_order=idx).where(models.OverrideCandidate.candidate_candidateid == candidateid)
                 oc.execute()
 
-        utils.update_views(models.database)
+        utils.update_views(models.database_proxy)
 
         return json.dumps({"message": "success"})
 
@@ -283,7 +283,7 @@ def candidate_detail(racedate, candidateid):
             oc = models.OverrideCandidate.create(candidate_candidateid=candidateid)
 
         utils.update_model(oc, payload)
-        utils.update_views(models.database)
+        utils.update_views(models.database_proxy)
 
         return json.dumps({"message": "success"})
 

@@ -54,8 +54,8 @@ class OverrideCandidate(BaseModel):
                 oc.save()
                 print oc.candidate_candidateid
 
-        database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
-        database.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
+        database_proxy.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
+        database_proxy.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
 
 
 class OverrideRace(BaseModel):
@@ -99,8 +99,8 @@ class OverrideRace(BaseModel):
             except cls.DoesNotExist:
                 r = cls.create(race_raceid=race.raceid)
 
-        database.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
-        database.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
+        database_proxy.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
+        database_proxy.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
 
 
 class ElexCandidate(BaseModel):
