@@ -114,6 +114,10 @@ def race_list(racedate):
         context['error'] = e
         return render_template('error.html', **context)
 
+    except peewee.ProgrammingError, e:
+        context['error'] = e
+        return render_template('error.html', **context)
+
 @app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
 def scripts(racedate, script_type):
     base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
