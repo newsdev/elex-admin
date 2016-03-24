@@ -6,6 +6,9 @@ from fabric import api, operations, contrib
 from fabric.state import env
 
 ENVIRONMENTS = {
+    "west": {
+        "hosts": 'ec2-50-18-105-1.us-west-1.compute.amazonaws.com',
+    },
     "prd": {
         "hosts": 'ec2-23-23-220-64.compute-1.amazonaws.com',
     }, 
