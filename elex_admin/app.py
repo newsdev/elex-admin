@@ -299,7 +299,7 @@ def set_loader_timeout(racedate):
         timeout = payload.get('timeout', '')
         os.system('echo export ELEX_LOADER_TIMEOUT=%s > /tmp/elex_loader_timeout.sh' % timeout)
 
-        return json.dumps({"message": "success"})
+        return json.dumps({"message": "success", "output": "0"})
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

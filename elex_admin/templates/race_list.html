@@ -132,17 +132,17 @@
 {% block extrajs %}
 <script type="text/javascript">
     $(function(){
-        var pop_alert = function(message, script_type){
+        var pop_alert = function(headline, success){
             /*
                 Message should have a key "output" that is a string.
             */
             message_text = "Failed; please check the logs."
-            if (message.output == "0") {
+            if (success == "0") {
                 message_text = "Success."
             }
-            var alert_text = '<div class="alert alert-danger" role="alert">Script <strong>'+ script_type + '</strong>: ' + message_text + ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+            var alert_text = '<div class="alert alert-danger" role="alert"><strong>'+ headline + '</strong>: ' + message_text + ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
             $('#alert-holder').html(alert_text);
-            if (message.output == "0") {
+            if (success == "0") {
                 $('#alert-holder .alert').removeClass('alert-danger').addClass('alert-success')
             }
         }
@@ -154,7 +154,9 @@
             $.ajax({
                 type: "GET",
                 url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
-                success: function(response){ pop_alert(response, script_type) },
+                success: function(response){ 
+                    pop_alert(script_type, response.output);
+                },
                 dataType: 'JSON'
             });
         }
@@ -166,7 +168,9 @@
                 type: 'POST',
                 data: data,
                 url: '/elections/2016/admin/{{ RACEDATE }}/loader/timeout/',
-                success: function(response){ },
+                success: function(response){
+                    pop_alert("Set timeout", response.output);
+                },
                 dataType: 'JSON'
             })
         }
