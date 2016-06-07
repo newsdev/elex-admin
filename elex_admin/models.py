@@ -95,12 +95,11 @@ class OverrideRace(BaseModel):
     def create_override_races(cls):
         races = ElexRace.select()
         for race in list(races):
-            uniqueid = "%s-%s" % (race.statepostal, race.raceid)
-            print uniqueid
+            print "%s %s" % (race.statepostal, race.raceid)
             try:
-                r = cls.get(cls.race_raceid == uniqueid)
+                r = cls.get(cls.race_raceid == race.raceid, cls.race_statepostal == race.statepostal)
             except cls.DoesNotExist:
-                r = cls.create(race_raceid=uniqueid)
+                r = cls.create(race_raceid=race.raceid, race_statepostal=race.statepostal)
 
         database_proxy.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
         database_proxy.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
@@ -143,6 +142,7 @@ class ElexRace(BaseModel):
     nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
     race_raceid = CharField(primary_key=True)
+    race_statepostal = CharField(null=True)
     description = CharField(null=True)
     id = CharField(null=True)
     initialization_data = BooleanField(null=True)
@@ -201,6 +201,7 @@ class ElexResult(BaseModel):
     nyt_race_name = CharField(null=True)
     nyt_winner = BooleanField(null=True)
     race_raceid = CharField(null=True)
+    race_statepostal = CharField(null=True)
     ballotorder = IntegerField(null=True)
     candidateid = CharField(null=True)
     description = CharField(null=True)

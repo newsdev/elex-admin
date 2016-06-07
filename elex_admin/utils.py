@@ -5,7 +5,7 @@ CDN_URL = os.environ.get('ELEX_ADMIN_CDN_URL', 'http://int.nyt.com.s3.amazonaws.
 
 ELEX_RACE_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_races as
    SELECT o.*, r.* from races as r
-   LEFT JOIN override_races as o on r.raceid = o.race_raceid
+   LEFT JOIN override_races as o on r.raceid = o.race_raceid and r.statepostal = o.race_statepostal
 ;"""
 
 ELEX_CANDIDATE_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_candidates as
@@ -23,7 +23,7 @@ ELEX_RESULTS_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_results as
        r.*
        FROM results as r
            LEFT JOIN override_candidates as c on r.candidateid = c.candidate_candidateid
-           LEFT JOIN override_races as o on r.raceid = o.race_raceid
+           LEFT JOIN override_races as o on r.raceid = o.race_raceid and r.statepostal = o.race_statepostal
            LEFT JOIN delegates as d on r.statepostal = d.state AND r.polid = d.candidateid
            LEFT JOIN delegates as n on r.polid = n.candidateid AND n.state = 'US'
 ;"""
@@ -73,28 +73,34 @@ def set_winner(candidateid, raceid):
     """
     import models
     if candidateid:
-        r = models.OverrideRace.update(nyt_called=True).where(models.OverrideRace.race_raceid == int(raceid))
+        r = models.OverrideRace.update(nyt_called=True).where(
+            models.OverrideRace.race_raceid == raceid.split('-')[1],
+            models.OverrideRace.race_statepostal == raceid.split('-')[0]
+        )
         nc = models.OverrideCandidate\
                 .update(nyt_winner=False)\
                 .where(
                     models.OverrideCandidate.candidate_candidateid != int(candidateid),
-                    models.OverrideCandidate.nyt_races.contains(int(raceid))
+                    models.OverrideCandidate.nyt_races.contains(raceid)
                 )
         yc = models.OverrideCandidate\
                 .update(nyt_winner=True)\
                 .where(
                     models.OverrideCandidate.candidate_candidateid == int(candidateid),
-                    models.OverrideCandidate.nyt_races.contains(int(raceid))
+                    models.OverrideCandidate.nyt_races.contains(raceid)
                 )
 
         r.execute()
         nc.execute()
         yc.execute()
     else:
-        r = models.OverrideRace.update(nyt_called=False).where(models.OverrideRace.race_raceid == int(raceid))
+        r = models.OverrideRace.update(nyt_called=False).where(
+            models.OverrideRace.race_raceid == raceid.split('-')[1],
+            models.OverrideRace.race_statepostal == raceid.split('-')[0]
+        )
         nc = models.OverrideCandidate\
                 .update(nyt_winner=False)\
-                .where(models.OverrideCandidate.nyt_races.contains(int(raceid)))
+                .where(models.OverrideCandidate.nyt_races.contains(raceid))
         r.execute()
         nc.execute()
 

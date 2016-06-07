@@ -189,9 +189,16 @@ def state_detail(racedate, statepostal):
     models.database_proxy.initialize(racedate_db)
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
-        races = [r.raceid for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
-        r = models.OverrideRace.update(report=payload['report'], report_description=payload['report_description']).where(models.OverrideRace.race_raceid << races)
-        r.execute()
+        races = ["%s-%s" % (r.statepostal, r.raceid) for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
+        for r in races:
+            o = models.OverrideRace.get(
+                    models.OverrideRace.race_raceid == r.split('-')[1],
+                    models.OverrideRace.race_statepostal == r.split('-')[0]
+            )
+            o.report=payload['report']
+            o.report_description=payload['report_description']
+            o.save()
+
         utils.update_views(models.database_proxy)
 
         return json.dumps({"message": "success"})
@@ -210,7 +217,11 @@ def race_detail(racedate,raceid):
             context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(raceid)), key=lambda x:x.nyt_display_order)
 
             context['ap_winner'] = None
-            ap_winner = models.ElexResult.select().where(models.ElexResult.raceid == raceid, models.ElexResult.winner == True)
+            ap_winner = models.ElexResult.select().where(
+                                            models.ElexResult.raceid == raceid.split('-')[1],
+                                            models.ElexResult.statepostal == raceid.split('-')[0], 
+                                            models.ElexResult.winner == True
+            )
             if len(ap_winner) > 0:
                 context['ap_winner'] = ap_winner[0]
 
@@ -240,9 +251,11 @@ def race_detail(racedate,raceid):
         models.database_proxy.initialize(racedate_db)
         payload = utils.clean_payload(dict(request.form))
         try:
-            r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid)
+            r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid.split('-')[1], models.OverrideRace.race_statepostal == raceid.split('-')[0])
         except models.OverrideRace.DoesNotExist:
-            r = models.OverrideRace.create(race_raceid=raceid)
+            r = models.OverrideRace.create(race_raceid=raceid.split('-')[1], race_statepostal=raceid.split('-')[0])
+
+        print payload
 
         utils.set_winner(payload['nyt_winner'], raceid)
 
