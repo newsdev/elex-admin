@@ -197,7 +197,7 @@ def state_detail(racedate, statepostal):
         return json.dumps({"message": "success"})
 
 @app.route('/elections/2016/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
-def race_detail(racedate, raceid):
+def race_detail(racedate,raceid):
     if request.method == 'GET':
         try:
             racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
@@ -206,8 +206,8 @@ def race_detail(racedate, raceid):
             )
             models.database_proxy.initialize(racedate_db)
             context = utils.build_context(racedate)
-            context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid)
-            context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(int(raceid))), key=lambda x:x.nyt_display_order)
+            context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid.split('-')[1], models.ElexRace.statepostal == raceid.split('-')[0])
+            context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(raceid)), key=lambda x:x.nyt_display_order)
 
             context['ap_winner'] = None
             ap_winner = models.ElexResult.select().where(models.ElexResult.raceid == raceid, models.ElexResult.winner == True)

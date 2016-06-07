@@ -18,7 +18,7 @@ class OverrideCandidate(BaseModel):
     candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
     nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
-    nyt_races = ArrayField(field_class=IntegerField)
+    nyt_races = ArrayField(field_class=CharField)
     nyt_candidate_important = BooleanField(null=True)
     nyt_winner = BooleanField(null=True)
     nyt_display_order = IntegerField(null=True)
@@ -49,7 +49,7 @@ class OverrideCandidate(BaseModel):
                     oc = cls.get(cls.candidate_candidateid == candidate.candidateid)
                 except cls.DoesNotExist:
                     oc = cls.create(candidate_candidateid=candidate.candidateid)
-                oc.nyt_races = [int(race.raceid)]
+                oc.nyt_races = ["%s-%s" % (race.statepostal,race.raceid)]
                 oc.nyt_display_order = idx
                 oc.save()
                 print oc.candidate_candidateid
@@ -68,6 +68,7 @@ class OverrideRace(BaseModel):
     nyt_race_description = TextField(null=True)
     nyt_race_name = CharField(null=True)
     race_raceid = CharField(primary_key=True)
+    race_statepostal = CharField(null=True)
     nyt_called = BooleanField(null=True)
     nyt_race_important = BooleanField(null=True)
 
@@ -82,6 +83,7 @@ class OverrideRace(BaseModel):
             utils.make_field(self, 'report'),
             utils.make_field(self, 'report_description'),
             utils.make_field(self, 'race_raceid'),
+            utils.make_field(self, 'race_statepostal'),
             utils.make_field(self, 'nyt_race_name'),
             utils.make_field(self, 'nyt_race_description'),
             utils.make_field(self, 'accept_ap_calls'),
@@ -93,11 +95,12 @@ class OverrideRace(BaseModel):
     def create_override_races(cls):
         races = ElexRace.select()
         for race in list(races):
-            print race.raceid
+            uniqueid = "%s-%s" % (race.statepostal, race.raceid)
+            print uniqueid
             try:
-                r = cls.get(cls.race_raceid == race.raceid)
+                r = cls.get(cls.race_raceid == uniqueid)
             except cls.DoesNotExist:
-                r = cls.create(race_raceid=race.raceid)
+                r = cls.create(race_raceid=uniqueid)
 
         database_proxy.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
         database_proxy.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
@@ -107,7 +110,7 @@ class ElexCandidate(BaseModel):
     candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
     nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
-    nyt_races = ArrayField(field_class=IntegerField)
+    nyt_races = ArrayField(field_class=CharField)
     ballotorder = IntegerField(null=True)
     candidateid = CharField(null=True)
     first = CharField(null=True)
@@ -167,17 +170,17 @@ class ElexRace(BaseModel):
         return "%s %s %s %s" % (self.statepostal, self.party, self.officename, self.racetype)
 
     def state(self):
-        results = ElexResult.select().where(ElexResult.raceid == self.raceid).where(ElexResult.level == 'state')
+        results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == 'state')
         if len(results) == 0:
-            results = ElexResult.select().where(ElexResult.raceid == self.raceid).where(ElexResult.level == None)
+            results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == None)
         return sorted([e for e in results], key=lambda x: x.last)
 
     def counties(self):
-        results = ElexResult.select().where(ElexResult.raceid == self.raceid).where(ElexResult.level == 'county')
+        results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == 'county')
         return sorted([e for e in results], key=lambda x: x.last)
 
     def townships(self):
-        results = ElexResult.select().where(ElexResult.raceid == self.raceid).where(ElexResult.level == 'county')
+        results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == 'county')
         return sorted([e for e in results], key=lambda x: x.last)
 
     def candidates(self):
