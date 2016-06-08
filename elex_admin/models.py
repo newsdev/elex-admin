@@ -95,15 +95,10 @@ class OverrideRace(BaseModel):
     def create_override_races(cls):
         races = ElexRace.select()
         for race in list(races):
-            if race.statepostal == "ND" and race.raceid == "35321":
-                print "%s %s" % (race.statepostal, race.raceid)
             try:
                 r = cls.get(cls.race_raceid == race.raceid, cls.race_statepostal == race.statepostal)
             except cls.DoesNotExist:
                 r = cls.create(race_raceid=race.raceid, race_statepostal=race.statepostal)
-
-            if race.statepostal == "ND" and race.raceid == "35321":
-                print r.__dict__
 
         database_proxy.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
         database_proxy.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
