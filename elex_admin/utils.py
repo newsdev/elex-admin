@@ -14,13 +14,10 @@ ELEX_CANDIDATE_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_candidates as
 ;"""
 
 ELEX_RESULTS_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_results as
-       (SELECT x.*, y.*, z.* FROM local_results as z
-                LEFT JOIN override_candidates as y on z.candidateid = y.candidate_candidateid
-                LEFT JOIN override_races as x on z.raceid = x.race_raceid and z.statepostal = x.race_statepostal)
-        UNION ALL
-        (SELECT a.*, b.*, c.* FROM national_results as c
-                LEFT JOIN override_candidates as b on c.candidateid = b.candidate_candidateid
-                LEFT JOIN override_races as a on c.raceid = a.race_raceid and c.statepostal = a.race_statepostal)"""
+    SELECT x.*, y.*, z.* FROM results as z
+        LEFT JOIN override_candidates as y on z.candidateid = y.candidate_candidateid
+        LEFT JOIN override_races as x on z.raceid = x.race_raceid and z.statepostal = x.race_statepostal
+;"""
 
 def make_field(cls, field_name):
     return (field_name, getattr(cls, field_name))
