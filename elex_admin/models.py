@@ -184,8 +184,8 @@ class ElexRace(BaseModel):
         results = ElexResult.select()\
                             .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
                             .where(ElexResult.level == 'state')
+        print self.statepostal, self.raceid
         if len(results) == 0:
-            print self.statepostal, self.raceid
             results = ElexResult.select()\
                             .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
                             .where(ElexResult.level == None)
