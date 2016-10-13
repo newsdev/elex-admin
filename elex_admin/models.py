@@ -181,17 +181,26 @@ class ElexRace(BaseModel):
         return "%s %s %s %s" % (self.statepostal, self.party, self.officename, self.racetype)
 
     def state(self):
-        results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == 'state')
+        results = ElexResult.select()\
+                            .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
+                            .where(ElexResult.level == 'state')
         if len(results) == 0:
-            results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == None)
+            print self.statepostal, self.raceid
+            results = ElexResult.select()\
+                            .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
+                            .where(ElexResult.level == None)
         return sorted([e for e in results], key=lambda x: x.last)
 
     def counties(self):
-        results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == 'county')
+        results = ElexResult.select()\
+                            .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
+                            .where(ElexResult.level == 'county')
         return sorted([e for e in results], key=lambda x: x.last)
 
     def townships(self):
-        results = ElexResult.select().where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid).where(ElexResult.level == 'county')
+        results = ElexResult.select()\
+                            .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
+                            .where(ElexResult.level == 'county')
         return sorted([e for e in results], key=lambda x: x.last)
 
     def candidates(self):
