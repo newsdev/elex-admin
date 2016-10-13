@@ -43,16 +43,28 @@ class OverrideCandidate(BaseModel):
     def add_candidates(cls):
         races = ElexRace.select()
         for race in list(races):
+            print "%s: %s" % (race.officename, race.statepostal)
             candidates = list(race.state())
             for idx, candidate in enumerate(candidates):
-                try:
-                    oc = cls.get(cls.candidate_candidateid == candidate.candidateid)
-                except cls.DoesNotExist:
-                    oc = cls.create(candidate_candidateid=candidate.candidateid)
+
+                # Presidential candidates cannot be confined to states
+                # like this; they will have repetitive candidate_id
+                # which is fine if you're not running in races in
+                # multiple states. Only President has this constraint.
+                if race.raceid == "0":
+                    try:
+                        oc = cls.get(cls.candidate_candidateid == candidate.id)
+                    except cls.DoesNotExist:
+                        oc = cls.create(candidate_candidateid=candidate.id)
+
+                else:
+                    try:
+                        oc = cls.get(cls.candidate_candidateid == candidate.candidateid)
+                    except cls.DoesNotExist:
+                        oc = cls.create(candidate_candidateid=candidate.candidateid)
                 oc.nyt_races = ["%s-%s" % (race.statepostal,race.raceid)]
                 oc.nyt_display_order = idx
                 oc.save()
-                print oc.candidate_candidateid
 
         database_proxy.execute_sql(utils.ELEX_RESULTS_VIEW_COMMAND)
         database_proxy.execute_sql(utils.ELEX_CANDIDATE_VIEW_COMMAND)
