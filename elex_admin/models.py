@@ -15,7 +15,6 @@ class BaseModel(Model):
 
 
 class OverrideCandidate(BaseModel):
-    candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
     nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
     nyt_races = ArrayField(field_class=CharField)
@@ -23,45 +22,63 @@ class OverrideCandidate(BaseModel):
     nyt_winner = BooleanField(null=True)
     nyt_display_order = IntegerField(null=True)
     nyt_delegates = IntegerField(null=True)
+    id = CharField(primary_key=True)
 
     class Meta:
         db_table = 'override_candidates'
 
     def serialize(self):
         return collections.OrderedDict([
-            utils.make_field(self, 'candidate_candidateid'),
             utils.make_field(self, 'nyt_candidate_name'),
             utils.make_field(self, 'nyt_candidate_important'),
             utils.make_field(self, 'nyt_candidate_description'),
             ('nyt_races', "{%s}" % ",".join([unicode(r) for r in self.nyt_races])),
             utils.make_field(self, 'nyt_display_order'),
             utils.make_field(self, 'nyt_winner'),
-            utils.make_field(self, 'nyt_delegates')
+            utils.make_field(self, 'nyt_delegates'),
+            utils.make_field(self, 'id')
         ])
 
     @classmethod
-    def add_candidates(cls):
-        races = ElexRace.select()
+    def add_prez_candidates(cls):
+        races = ElexRace.select().where(ElexRace.raceid == "0")
         for race in list(races):
-            print "%s: %s" % (race.officename, race.statepostal)
+            print "President: %s" % race.statepostal
+
+            candidates = ElexResult.select()\
+                            .where(ElexResult.statepostal == race.statepostal, ElexResult.raceid == race.raceid)\
+                            .where(ElexResult.level << ['state', 'national'])
+
+            candidates = sorted([e for e in candidates], key=lambda x: x.last)
+
+            for idx, candidate in enumerate(candidates):
+                try:
+                    oc = cls.get(cls.id == candidate.candidate_unique_id)
+                except cls.DoesNotExist:
+                    oc = cls.create(id=candidate.candidate_unique_id)
+
+                if not oc.nyt_races:
+                    oc.nyt_races = []
+
+                oc.nyt_races.append("%s-%s" % (race.statepostal,race.raceid))
+                oc.nyt_display_order = idx
+                oc.save()
+
+    @classmethod
+    def add_candidates(cls):
+        races = ElexRace.select().where(ElexRace.raceid != "0")
+
+        for race in list(races):
+            print race.statepostal, race.officename, race.seatname
+
             candidates = list(race.state())
             for idx, candidate in enumerate(candidates):
 
-                # Presidential candidates cannot be confined to states
-                # like this; they will have repetitive candidate_id
-                # which is fine if you're not running in races in
-                # multiple states. Only President has this constraint.
-                if race.raceid == "0":
-                    try:
-                        oc = cls.get(cls.candidate_candidateid == candidate.id)
-                    except cls.DoesNotExist:
-                        oc = cls.create(candidate_candidateid=candidate.id)
+                try:
+                    oc = cls.get(cls.id == candidate.candidate_unique_id)
+                except cls.DoesNotExist:
+                    oc = cls.create(id=candidate.candidate_unique_id)
 
-                else:
-                    try:
-                        oc = cls.get(cls.candidate_candidateid == candidate.candidateid)
-                    except cls.DoesNotExist:
-                        oc = cls.create(candidate_candidateid=candidate.candidateid)
                 oc.nyt_races = ["%s-%s" % (race.statepostal,race.raceid)]
                 oc.nyt_display_order = idx
                 oc.save()
@@ -117,12 +134,10 @@ class OverrideRace(BaseModel):
 
 
 class ElexCandidate(BaseModel):
-    candidate_candidateid = CharField(db_column='candidate_candidateid', primary_key=True)
     nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
     nyt_races = ArrayField(field_class=CharField)
     ballotorder = IntegerField(null=True)
-    candidateid = CharField(null=True)
     first = CharField(null=True)
     id = CharField(null=True)
     last = CharField(null=True)
@@ -184,7 +199,6 @@ class ElexRace(BaseModel):
         results = ElexResult.select()\
                             .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
                             .where(ElexResult.level == 'state')
-        print self.statepostal, self.raceid
         if len(results) == 0:
             results = ElexResult.select()\
                             .where(ElexResult.statepostal == self.statepostal, ElexResult.raceid == self.raceid)\
@@ -213,7 +227,6 @@ class ElexResult(BaseModel):
     nyt_delegate_allocation = TextField(null=True)
     report = BooleanField(null=True)
     report_description = TextField(null=True)
-    candidate_candidateid = CharField(db_column='candidate_candidateid')
     nyt_candidate_description = TextField(null=True)
     nyt_candidate_name = CharField(null=True)
     accept_ap_calls = BooleanField(null=True)
@@ -263,6 +276,7 @@ class ElexResult(BaseModel):
     nyt_called = BooleanField(null=True)
     nyt_display_order = IntegerField(null=True)
     nyt_delegates = IntegerField(null=True)
+    candidate_unique_id = CharField(null=True)
 
     class Meta:
         db_table = "elex_results"

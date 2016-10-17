@@ -9,14 +9,13 @@ ELEX_RACE_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_races as
 ;"""
 
 ELEX_CANDIDATE_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_candidates as
-   SELECT c.*, r.* from candidates as r
-       LEFT JOIN override_candidates as c on r.candidateid = c.candidate_candidateid
+       SELECT c.nyt_candidate_name,c.nyt_candidate_important,c.nyt_candidate_description,c.nyt_races,c.nyt_display_order,c.nyt_winner,c.nyt_delegates, r.* from candidates as r
+           LEFT JOIN override_candidates as c on r.id = c.id
 ;"""
 
-ELEX_RESULTS_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_results as
-    SELECT x.*, y.*, z.* FROM results as z
-        LEFT JOIN override_candidates as y on z.candidateid = y.candidate_candidateid
-        LEFT JOIN override_races as x on z.raceid = x.race_raceid and z.statepostal = x.race_statepostal
+ELEX_RESULTS_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_candidates as
+       SELECT c.nyt_candidate_name,c.nyt_candidate_important,c.nyt_candidate_description,c.nyt_races,c.nyt_display_order,c.nyt_winner,c.nyt_delegates, r.* from candidates as r
+           LEFT JOIN override_candidates as c on r.id = c.id
 ;"""
 
 def make_field(cls, field_name):

@@ -10,5 +10,6 @@ if __name__ == "__main__":
         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
     )
     models.database_proxy.initialize(racedate_db)
-    models.OverrideCandidate.add_candidates()
+    # models.OverrideCandidate.add_candidates()
+    models.OverrideCandidate.add_prez_candidates()
     models.OverrideRace.create_override_races()
