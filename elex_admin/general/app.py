@@ -116,27 +116,15 @@ def race_list(racedate):
 
         context['states'] = sorted(ALL_STATES, key=lambda x:x)
 
-        context['ap_winners'] = []
-        context['nyt_winners'] = []
+        try:
+            context['ap_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.get(models.ElexResult.raceid == "0",models.ElexResult.level == 'state',models.ElexResult.winner == True)]
+        except models.ElexResult.DoesNotExist:
+            context['ap_winners'] = []
 
-        for s in ALL_STATES:
-            try:
-                winner = models.ElexResult.get(
-                                    models.ElexResult.race_unique_id == '%s-0' % s,
-                                    models.ElexResult.level == 'state',
-                                    models.ElexResult.winner == True)
-                context['ap_winners'].append({'statepostal': winner.statepostal, 'raceid': winner.raceid, 'candidate_unique_id': winner.candidate_unique_id})
-            except models.ElexResult.DoesNotExist:
-                pass
-
-            try:
-                winner = models.OverrideCandidate.get(
-                                    models.OverrideCandidate.raceid == "0",
-                                    models.OverrideCandidate.statepostal == '%s' % s,
-                                    models.OverrideCandidate.nyt_winner == True)
-                context['nyt_winners'].append({'statepostal': winner.statepostal, 'raceid': winner.raceid, 'candidate_unique_id': winner.candidate_unique_id})
-            except models.OverrideCandidate.DoesNotExist:
-                pass
+        try:
+            context['nyt_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.OverrideCandidate.select().where(models.OverrideCandidate.raceid == "0", models.OverrideCandidate.nyt_winner == True)]
+        except models.ElexResult.DoesNotExist:
+            context['nyt_winners'] = []
 
         context['prez_swing'] = models.ElexRace\
                                     .select()\
