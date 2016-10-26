@@ -117,7 +117,7 @@ def race_list(racedate):
         context['states'] = sorted(ALL_STATES, key=lambda x:x)
 
         try:
-            context['ap_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.get(models.ElexResult.raceid == "0",models.ElexResult.level == 'state',models.ElexResult.winner == True)]
+            context['ap_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select().where(models.ElexResult.raceid == "0",models.ElexResult.level == 'state',models.ElexResult.winner == True)]
         except models.ElexResult.DoesNotExist:
             context['ap_winners'] = []
 
