@@ -11,6 +11,9 @@
     .prez .btn.ap-winner.clinton {
         border-bottom: 5px solid blue;
     }
+    .prez .btn.ap-winner.third {
+        border-bottom: 5px solid green;
+    }
     .prez .btn.winner {
         background-color: green;
         color: #fff;
@@ -166,8 +169,8 @@
                 {{ state.statepostal }}
                 <small class="yes"></small><small class="no"></small>
             </a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
+            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
 
         </div>{% endif %}
         {% endfor %}
@@ -196,9 +199,9 @@
                 {{ state.statepostal }}
                 <small class="yes"></small><small class="no"></small>
             </a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-31708' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-31708' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-31708">Johnson</a>
+            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
+            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+            <a class="third candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-31708' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-31708' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-31708">Johnson</a>
         </div>{% endif %}
         {% endfor %}
         </div>
@@ -230,8 +233,8 @@
                 {{ state.statepostal }}
                 <small class="yes"></small><small class="no"></small>
             </a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
+            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
 
         </div>{% endif %}
         {% endfor %}
@@ -258,9 +261,9 @@
             ">
                 {{ state.statepostal }}<small class="yes"></small><small class="no"></small>
             </a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
-            <a class="candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-65775' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-65775' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-65775">McMullin</a>
+            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
+            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+            <a class="third candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-65775' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-65775' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-65775">McMullin</a>
         </div>{% endif %}
         {% endfor %}
         </div>
