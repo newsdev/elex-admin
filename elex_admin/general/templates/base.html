@@ -15,6 +15,10 @@
         .navbar-primary {
             border-bottom: 2px solid #388e3c;
         }
+        .navbar-default .navbar-bits li:not(.navbar-form) a {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
     </style>
   </head>
   <body>
@@ -35,10 +39,10 @@
           <li>
             <ul class="nav navbar-nav navbar-right">
               <li id="fat-menu" class="dropdown">
-                <a id="drop3" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Race dates<span class="caret"></span></a>
+                <a id="drop3" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">States<span class="caret"></span></a>
                 <ul class="dropdown-menu" aria-labelledby="drop3">
-                  {% for r in race_dates %}
-                    {% if r == RACEDATE %}<li class="disabled"><a href="#">{% else %}<li><a href="/elections/2016/admin/{{ r }}/">{% endif %}{{ r }}</a></li>
+                  {% for s in states %}
+                    <li><a href="/elections/2016/admin/2016-11-08/state/{{ s }}/">{{ s }}</a></li>
                   {% endfor %}
                 </ul>
               </li>

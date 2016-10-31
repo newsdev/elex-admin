@@ -30,8 +30,6 @@ SENATE_SWING = ['WI','IN','NV','NH','PA','NC','MO']
 SENATE_GOP = ['FL','AZ','LA','KY','IA','AR','OH','GA','AL','SD','OK','ND','UT','KS','SC','ID','AK']
 SENATE_DEM = ['CA','VT','NY','MD','HI','CT','OR','WA','CO','IL']
 
-SENATE_IMPORTANT = ['polid-1719','polid-60424','polid-1343','polid-65377','polid-452','polid-55909','polid-61040','polid-62653','polid-65148','polid-60689','polid-63486','polid-257','polid-1765','polid-60740']
-
 ALL_STATES = [x for x in SENATE_SWING + SENATE_GOP + SENATE_DEM]
 
 
@@ -133,6 +131,15 @@ def race_list(racedate):
         except models.ElexResult.DoesNotExist:
             context['nyt_winners'] = []
 
+        context['prez_cands'] = models.ElexResult\
+                                    .select()\
+                                    .where(
+                                        models.ElexResult.officeid == "P",
+                                        models.ElexResult.level == "state",
+                                        models.ElexResult.party << ['Dem', 'GOP']
+                                    )\
+                                    .order_by(+models.ElexResult.statepostal)
+
         context['prez_swing'] = models.ElexRace\
                                     .select()\
                                     .where(
@@ -170,7 +177,7 @@ def race_list(racedate):
                                     .where(
                                         models.ElexResult.officeid == "S",
                                         models.ElexResult.statepostal << SENATE_SWING,
-                                        models.ElexResult.candidate_unique_id << SENATE_IMPORTANT,
+                                        models.ElexResult.party << ["Dem", "GOP"],
                                         models.ElexResult.level == 'state'
                                     )\
                                     .order_by(+models.ElexResult.statepostal, +models.ElexResult.last)
