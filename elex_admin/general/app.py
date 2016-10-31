@@ -22,10 +22,17 @@ import general.utils as utils
 app = Flask(__name__)
 app.debug=True
 
-SWING_STATES = ['FL','PA','OH','NC','VA','WI','CO','IA','NV','NH','AZ','GA','ME-2','NE-2']
-LEAN_DEM = ['DC','HI','MD','VT','CA','NY','MA','RI','NJ','IL','CT','DE','WA','OR','NM','ME','MI','MN','ME-1']
-LEAN_GOP = ['MO','IN','SC','TX','AK','MS','NE','LA','MT','UT','KS','AK','SD','TN','ND','AL','KY','OK','ID','WV','WY','NE-1','NE-3']
-ALL_STATES = [x for x in SWING_STATES + LEAN_GOP + LEAN_DEM if x not in ['ME-1','ME-2','NE-1','NE-2','NE-3']]
+PREZ_SWING = ['FL','PA','OH','NC','VA','WI','CO','IA','NV','NH','AZ','GA','ME-2','NE-2']
+PREZ_DEM = ['DC','HI','MD','VT','CA','NY','MA','RI','NJ','IL','CT','DE','WA','OR','NM','ME','MI','MN','ME-1']
+PREZ_GOP = ['MO','IN','SC','TX','AR','MS','NE','LA','MT','UT','KS','AK','SD','TN','ND','AL','KY','OK','ID','WV','WY','NE-1','NE-3']
+
+SENATE_SWING = ['WI','IN','NV','NH','PA','NC','MO'] 
+SENATE_GOP = ['FL','AZ','LA','KY','IA','AR','OH','GA','AL','SD','OK','ND','UT','KS','SC','ID','AK']
+SENATE_DEM = ['CA','VT','NY','MD','HI','CT','OR','WA','CO','IL']
+
+SENATE_IMPORTANT = ['polid-1719','polid-60424','polid-1343','polid-65377','polid-452','polid-55909','polid-61040','polid-62653','polid-65148','polid-60689','polid-63486','polid-257','polid-1765','polid-60740']
+
+ALL_STATES = [x for x in SENATE_SWING + SENATE_GOP + SENATE_DEM]
 
 
 @app.route('/elections/2016/admin/<racedate>/actions/call-race/', methods=['POST'])
@@ -117,49 +124,97 @@ def race_list(racedate):
         context['states'] = sorted(ALL_STATES, key=lambda x:x)
 
         try:
-            context['ap_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select().where(models.ElexResult.raceid == "0",models.ElexResult.level == 'state',models.ElexResult.winner == True)]
+            context['ap_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select().where(models.ElexResult.officeid << ["P","S"],models.ElexResult.level == 'state',models.ElexResult.winner == True)]
         except models.ElexResult.DoesNotExist:
             context['ap_winners'] = []
 
         try:
-            context['nyt_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.OverrideCandidate.select().where(models.OverrideCandidate.raceid == "0", models.OverrideCandidate.nyt_winner == True)]
+            context['nyt_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select().where(models.ElexResult.officeid << ["P","S"],models.ElexResult.level == 'state',models.ElexResult.nyt_winner == True)]
         except models.ElexResult.DoesNotExist:
             context['nyt_winners'] = []
 
         context['prez_swing'] = models.ElexRace\
                                     .select()\
                                     .where(
-                                        models.ElexRace.national == True, 
                                         models.ElexRace.officeid == "P",
-                                        models.ElexRace.statepostal << SWING_STATES
+                                        models.ElexRace.statepostal << PREZ_SWING
                                     )\
                                     .order_by(+models.ElexRace.statepostal)
 
         context['prez_lean_gop'] = models.ElexRace\
                                     .select()\
                                     .where(
-                                        models.ElexRace.national == True, 
                                         models.ElexRace.officeid == "P",
-                                        models.ElexRace.statepostal << LEAN_GOP
+                                        models.ElexRace.statepostal << PREZ_GOP
                                     )\
                                     .order_by(+models.ElexRace.statepostal)
 
         context['prez_lean_dem'] = models.ElexRace\
                                     .select()\
                                     .where(
-                                        models.ElexRace.national == True, 
                                         models.ElexRace.officeid == "P",
-                                        models.ElexRace.statepostal << LEAN_DEM
+                                        models.ElexRace.statepostal << PREZ_DEM
                                     )\
                                     .order_by(+models.ElexRace.statepostal)
 
-        # context['senate'] = models.ElexRace\
-        #                             .select()\
-        #                             .where(
-        #                                 models.ElexRace.national == True,
-        #                                 models.ElexRace.officeid == "S"
-        #                             )\
-        #                             .order_by(+models.ElexRace.statepostal)
+        context['senate_swing'] = models.ElexRace\
+                                    .select()\
+                                    .where(
+                                        models.ElexRace.officeid == "S",
+                                        models.ElexRace.statepostal << SENATE_SWING
+                                    )\
+                                    .order_by(+models.ElexRace.statepostal)
+
+        context['senate_swing_cands'] = models.ElexResult\
+                                    .select()\
+                                    .where(
+                                        models.ElexResult.officeid == "S",
+                                        models.ElexResult.statepostal << SENATE_SWING,
+                                        models.ElexResult.candidate_unique_id << SENATE_IMPORTANT,
+                                        models.ElexResult.level == 'state'
+                                    )\
+                                    .order_by(+models.ElexResult.statepostal, +models.ElexResult.last)
+
+        context['senate_lean_gop'] = models.ElexRace\
+                                    .select()\
+                                    .where(
+                                        models.ElexRace.national == True,
+                                        models.ElexRace.officeid == "S",
+                                        models.ElexRace.statepostal << SENATE_GOP,
+                                    )\
+                                    .order_by(+models.ElexRace.statepostal)
+
+        context['senate_lean_gop_cands'] = models.ElexResult\
+                                    .select()\
+                                    .where(
+                                        models.ElexResult.national == True,
+                                        models.ElexResult.officeid == "S",
+                                        models.ElexResult.statepostal << SENATE_GOP,
+                                        models.ElexResult.party << ["Dem", "GOP"],
+                                        models.ElexResult.level == 'state'
+                                    )\
+                                    .order_by(+models.ElexResult.statepostal)
+
+        context['senate_lean_dem'] = models.ElexRace\
+                                    .select()\
+                                    .where(
+                                        models.ElexRace.national == True,
+                                        models.ElexRace.officeid == "S",
+                                        models.ElexRace.statepostal << SENATE_DEM
+                                    )\
+                                    .order_by(+models.ElexRace.statepostal)
+
+        context['senate_lean_dem_cands'] = models.ElexResult\
+                                    .select()\
+                                    .where(
+                                        models.ElexResult.national == True,
+                                        models.ElexResult.officeid == "S",
+                                        models.ElexResult.statepostal << SENATE_DEM,
+                                        models.ElexResult.party << ["Dem", "GOP"],
+                                        models.ElexResult.level == 'state'
+                                    )\
+                                    .order_by(+models.ElexResult.statepostal)
+
 
         # context['house'] = models.ElexRace\
         #                             .select()\

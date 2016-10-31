@@ -2,25 +2,23 @@
 
 {% block content %}
 <style type="text/css">
-    .prez .btn {
-        border-bottom: 5px solid #aaa;
+    .prez .btn, .senate .btn {
+        border-bottom: 5px solid #ddd;
     }
-    .prez .btn.ap-winner.trump {
-        border-bottom: 5px solid red;
+    .btn.ap-winner {
+        border-bottom: 5px solid turquoise;
     }
-    .prez .btn.ap-winner.clinton {
-        border-bottom: 5px solid blue;
+    .prez.btn, .senate.btn {
+        border-left: 5px solid #ddd;
     }
-    .prez .btn.ap-winner.third {
-        border-bottom: 5px solid green;
+    .btn.gop {
+        border-left: 5px solid red;
     }
-    .prez .btn.winner {
-        background-color: green;
-        color: #fff;
+    .btn.dem {
+        border-left: 5px solid blue;
     }
-    .prez .btn.winner:hover {
-        background-color: lightgreen;
-        color: #fff;
+    .btn.winner {
+        background-color: pink;
     }
     #state-nav {
         width: 150px;
@@ -41,18 +39,21 @@
         width: 20px;
         text-align: center;
     }
-    a small {
+    a.state small {
         font-weight: normal;
         font-size:12px;
         display:block;
         color: #aaa;
         line-height:8px;
     }
+    a.state small {
+        text-align:center;
+    }
     a.state:hover {
         text-decoration: none;
     }
     a.state small.no::after {
-        content: "NYT calls";
+        content: "NYT";
         color: orange;
         font-weight: bold;
     }
@@ -63,7 +64,7 @@
         content: "";
     }
     a.state.accept_ap_calls small.yes::after {
-        content: "AP calls";
+        content: "AP";
     }
 </style>
 
@@ -80,7 +81,7 @@
 
 <div class="row" style="margin-bottom:20px;">
     <div class="col-md-12">
-        <h1>{{ RACEDATE }} {% for state in states %}{{ state.statepostal }} {% endfor %}</h1>
+        <h1>2016 General Election</h1>
     </div>
 </div>
 
@@ -109,9 +110,11 @@
     </div>
 </div>
 
-<div class="row prez" style="margin-top:25px;">
+<h1>Swing States</h1>
+
+<div class="row prez race" style="margin-top:25px;">
     <div class="col-md-12">
-        <h3>Presidential Swing States</h3>
+        <h3>President</h3>
         <div class="row">
         {% for state in prez_swing %}
         <div 
@@ -122,20 +125,24 @@
             data-raceid="{{ state.raceid }}"
             style="margin-bottom: 10px;"
         >
-            <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
-                width:60px;
-                display:inline-block;
-                font-size:26px;
-                font-weight:bold;
-                margin: 0 0 0 0;
-                line-height: 1.42857143;
-                vertical-align:middle;
-            ">
-                {{ state.statepostal }}
-                <small class="yes"></small><small class="no"></small>
-            </a>
-            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+            <div class="row">
+                <div class="col-md-3">
+                    <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
+                        font-size:26px;
+                        font-weight:bold;
+                        vertical-align:middle;
+                    ">
+                        {{ state.statepostal }}
+                        <small class="yes"></small><small class="no"></small>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a class="dem candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
+                </div>
+                <div class="col-md-4">
+                    <a class="gop candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+                </div>
+            </div>
         </div>
         {% endfor %}
         </div>
@@ -143,164 +150,206 @@
     </div>
 </div>
 
-<div class="row prez" style="margin-top:25px;">
-    <div class="col-md-6">
-        <h3>President: Lean Dem</h3>
+<div class="row senate race" style="margin-top:25px;">
+    <div class="col-md-12">
+        <h3>Senate</h3>
         <div class="row">
-        {% for state in prez_lean_dem %}
-        {% if state.statepostal != 'NM' %}
+        {% for state in senate_swing %}
         <div 
-            class="col-md-6"
+            class="col-md-4"
             id="state-{{ state.statepostal }}"
             data-officeid="{{ state.officeid }}"
             data-statepostal="{{ state.statepostal }}"
             data-raceid="{{ state.raceid }}"
             style="margin-bottom: 10px;"
         >
-            <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
-                width:60px;
-                display:inline-block;
-                font-size:26px;
-                font-weight:bold;
-                margin: 0 0 0 0;
-                line-height: 1.42857143;
-                vertical-align:middle;
-            ">
-                {{ state.statepostal }}
-                <small class="yes"></small><small class="no"></small>
-            </a>
-            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
-
-        </div>{% endif %}
-        {% endfor %}
+            <div class="row">
+                <div class="col-md-2">
+                    <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
+                        font-size:26px;
+                        font-weight:bold;
+                        vertical-align:middle;
+                    ">
+                        {{ state.statepostal }}
+                        <small class="yes"></small><small class="no"></small>
+                    </a>
+                </div>
+                    {% for c in senate_swing_cands %}
+                    {% if c.race_unique_id == state.race_unique_id %}
+                <div class="col-md-5">
+                    <a class="{{ c.party|lower }} candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == '{{ c.candidate_unique_id }}' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == '{{ c.candidate_unique_id }}' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="{{ c.candidate_unique_id }}">{{ c.last }}</a>
+                </div>
+                    {% endif %}
+                    {% endfor %}
+            </div>
         </div>
-
-        <div class="row">
-        {% for state in prez_lean_dem %}
-        {% if state.statepostal == 'NM' %}
-        <div 
-            class="col-md-12"
-            id="state-{{ state.statepostal }}"
-            data-officeid="{{ state.officeid }}"
-            data-statepostal="{{ state.statepostal }}"
-            data-raceid="{{ state.raceid }}"
-            style="margin-bottom: 10px;"
-        >
-            <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
-                width:60px;
-                display:inline-block;
-                font-size:26px;
-                font-weight:bold;
-                margin: 0 0 0 0;
-                line-height: 1.42857143;
-                vertical-align:middle;
-            ">
-                {{ state.statepostal }}
-                <small class="yes"></small><small class="no"></small>
-            </a>
-            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
-            <a class="third candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-31708' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-31708' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-31708">Johnson</a>
-        </div>{% endif %}
         {% endfor %}
         </div>
 
     </div>
-
-    <div class="col-md-6">
-        <h3>President: Lean GOP</h3>
-        <div class="row">
-        {% for state in prez_lean_gop %}
-        {% if state.statepostal != 'UT' %}
-        <div 
-            class="col-md-6"
-            id="state-{{ state.statepostal }}"
-            data-officeid="{{ state.officeid }}"
-            data-statepostal="{{ state.statepostal }}"
-            data-raceid="{{ state.raceid }}"
-            style="margin-bottom: 10px;"
-        >
-            <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
-                width:60px;
-                display:inline-block;
-                font-size:26px;
-                font-weight:bold;
-                margin: 0 0 0 0;
-                line-height: 1.42857143;
-                vertical-align:middle;
-            ">
-                {{ state.statepostal }}
-                <small class="yes"></small><small class="no"></small>
-            </a>
-            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
-
-        </div>{% endif %}
-        {% endfor %}
-        </div>
-        <div class="row">
-        {% for state in prez_lean_gop %}
-        {% if state.statepostal == 'UT' %}
-        <div 
-            class="col-md-12"
-            id="state-{{ state.statepostal }}"
-            data-officeid="{{ state.officeid }}"
-            data-statepostal="{{ state.statepostal }}"
-            data-raceid="{{ state.raceid }}"
-            style="margin-bottom: 10px;"
-        >
-            <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
-                width:60px;
-                display:inline-block;
-                font-size:26px;
-                font-weight:bold;
-                margin: 0 0 0 0;
-                line-height: 1.42857143;
-                vertical-align:middle;
-            ">
-                {{ state.statepostal }}<small class="yes"></small><small class="no"></small>
-            </a>
-            <a class="clinton candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
-            <a class="trump candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
-            <a class="third candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-65775' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-65775' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-65775">McMullin</a>
-        </div>{% endif %}
-        {% endfor %}
-        </div>
-
-    </div>
-
 </div>
 
-<!-- <div class="row" style="margin-top:25px;">
-    <div class="col-md-12">
-        <h3>President</h3>
-    </div>
-    <div class="col-md-12" style="margin-bottom:30px;">
-        <button class="btn btn-large btn-default script" data-script="accept_prez_calls"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>&nbsp;&nbsp;Accept AP Calls</button>
+<hr/>
 
-        <button class="btn btn-large btn-default script" data-script="ignore_prez_calls"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>&nbsp;&nbsp;Ignore AP Calls</button>
-    </div>
-    <div class="col-md-12">
-        <table class="table">
-        <tr>
-            <th>State</th>
-            <th>Party</th>
-            <th>Office</th>
-            <th>Type</th>
-        </tr>
+<h1>President</h1>
 
-        {% for race in presidential_races %}
-        <tr>
-            <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.statepostal }}-{{ race.id }}/">{{ race.statepostal }}</a></td>
-            <td>{{ race.party }}</td>
-            <td>{{ race.officename }}</td>
-            <td>{{ race.racetype }}</td>
-        </tr>
+<div class="row prez race" style="margin-top:25px;">
+    <div class="col-md-12">
+        <h3>Lean GOP</h3>
+        <div class="row">
+        {% for state in prez_lean_gop %}
+        <div 
+            class="col-md-3"
+            id="state-{{ state.statepostal }}"
+            data-officeid="{{ state.officeid }}"
+            data-statepostal="{{ state.statepostal }}"
+            data-raceid="{{ state.raceid }}"
+            style="margin-bottom: 10px;"
+        >
+            <div class="row">
+                <div class="col-md-3">
+                    <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
+                        font-size:26px;
+                        font-weight:bold;
+                        vertical-align:middle;
+                    ">
+                        {{ state.statepostal }}
+                        <small class="yes"></small><small class="no"></small>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a class="dem candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
+                </div>
+                <div class="col-md-4">
+                    <a class="gop candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-        </table>
+        </div>
+
     </div>
-</div> -->
+</div>
+
+<div class="row prez race" style="margin-top:25px;">
+    <div class="col-md-12">
+        <h3>Lean Dem</h3>
+        <div class="row">
+        {% for state in prez_lean_dem %}
+        <div 
+            class="col-md-3"
+            id="state-{{ state.statepostal }}"
+            data-officeid="{{ state.officeid }}"
+            data-statepostal="{{ state.statepostal }}"
+            data-raceid="{{ state.raceid }}"
+            style="margin-bottom: 10px;"
+        >
+            <div class="row">
+                <div class="col-md-3">
+                    <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
+                        font-size:26px;
+                        font-weight:bold;
+                        vertical-align:middle;
+                    ">
+                        {{ state.statepostal }}
+                        <small class="yes"></small><small class="no"></small>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a class="dem candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-1746">Clinton</a>
+                </div>
+                <div class="col-md-4">
+                    <a class="gop candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="polid-8639">Trump</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<hr/>
+
+<h1>Senate</h1>
+
+<div class="row senate race" style="margin-top:25px;">
+    <div class="col-md-12">
+        <h3>Lean GOP</h3>
+        <div class="row">
+        {% for state in senate_lean_gop %}
+        <div 
+            class="col-md-4"
+            id="state-{{ state.statepostal }}"
+            data-officeid="{{ state.officeid }}"
+            data-statepostal="{{ state.statepostal }}"
+            data-raceid="{{ state.raceid }}"
+            style="margin-bottom: 10px;"
+        >
+            <div class="row">
+                <div class="col-md-2">
+                    <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
+                        font-size:26px;
+                        font-weight:bold;
+                        vertical-align:middle;
+                    ">
+                        {{ state.statepostal }}
+                        <small class="yes"></small><small class="no"></small>
+                    </a>
+                </div>
+                    {% for c in senate_lean_gop_cands %}
+                    {% if c.race_unique_id == state.race_unique_id %}
+                <div class="col-md-5">
+                    <a class="{{ c.party|lower }} candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == '{{ c.candidate_unique_id }}' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == '{{ c.candidate_unique_id }}' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="{{ c.candidate_unique_id }}">{{ c.last }}</a>
+                </div>
+                    {% endif %}
+                    {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<div class="row senate race" style="margin-top:25px;">
+    <div class="col-md-12">
+        <h3>Lean Dem</h3>
+        <div class="row">
+        {% for state in senate_lean_dem %}
+        <div 
+            class="col-md-4"
+            id="state-{{ state.statepostal }}"
+            data-officeid="{{ state.officeid }}"
+            data-statepostal="{{ state.statepostal }}"
+            data-raceid="{{ state.raceid }}"
+            style="margin-bottom: 10px;"
+        >
+            <div class="row">
+                <div class="col-md-2">
+                    <a class="state{% if state.accept_ap_calls %} accept_ap_calls{% endif %}" style="
+                        font-size:26px;
+                        font-weight:bold;
+                        vertical-align:middle;
+                    ">
+                        {{ state.statepostal }}
+                        <small class="yes"></small><small class="no"></small>
+                    </a>
+                </div>
+                    {% for c in senate_lean_dem_cands %}
+                    {% if c.race_unique_id == state.race_unique_id %}
+                <div class="col-md-5">
+                    <a class="{{ c.party|lower }} candidate btn btn-default{% if ap_winners %}{% for r in ap_winners %}{% if r.candidate_unique_id == '{{ c.candidate_unique_id }}' and r.statepostal == state.statepostal and r.raceid == state.raceid %} ap-winner{% endif %}{% endfor %}{% endif %}{% if nyt_winners %}{% for r in nyt_winners %}{% if r.candidate_unique_id == '{{ c.candidate_unique_id }}' and r.statepostal == state.statepostal and r.raceid == state.raceid %} winner{% endif %}{% endfor %}{% endif %}" href="#" id="{{ c.candidate_unique_id }}">{{ c.last }}</a>
+                </div>
+                    {% endif %}
+                    {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+
+    </div>
+</div>
 {% endblock %}
 
 {% block extrajs %}
@@ -318,6 +367,8 @@
                 statepostal: race_unique_id.split('-')[0],
                 raceid: race_unique_id.split('-')[1]
             }
+
+            console.log(data);
 
             $.ajax({
                 type: "POST",
@@ -349,7 +400,7 @@
                 officeid: officeid
             };
 
-            console.log($el.attr('class'));
+            console.log(data);
 
             $.ajax({
                 type: "POST",
@@ -379,8 +430,8 @@
             $el = $(this)
 
             var candidate_unique_id = $el.attr('id')
-            var raceid = $el.parent('div').attr('data-raceid');
-            var statepostal = $el.parent('div').attr('data-statepostal');
+            var raceid = $el.parent('div').parent('div').parent('div').attr('data-raceid');
+            var statepostal = $el.parent('div').parent('div').parent('div').attr('data-statepostal');
 
             if ($(this).hasClass('winner')) {
                 call_race(null, statepostal + '-' + raceid, $el);
@@ -399,9 +450,9 @@
 
             $el = $(this)
 
-            var raceid = $el.parent('div').attr('data-raceid');
-            var statepostal = $el.parent('div').attr('data-statepostal');
-            var officeid = $el.parent('div').attr('data-officeid');
+            var raceid = $el.parent('div').parent('div').parent('div').attr('data-raceid');
+            var statepostal = $el.parent('div').parent('div').parent('div').attr('data-statepostal');
+            var officeid = $el.parent('div').parent('div').parent('div').attr('data-officeid');
 
             if ($(this).hasClass('accept_ap_calls')) {
                 set_ap(false, raceid, statepostal, officeid, $el);
@@ -410,8 +461,8 @@
             }
         }
 
-        $('.prez a.candidate').on('click', race_call_click)
-        $('.prez a.state').on('click', ap_call_click)
+        $('.race a.candidate').on('click', race_call_click)
+        $('.race a.state').on('click', ap_call_click)
         // var submit_state = function(data){
         //     /*
         //         Submit the current state of a race in the form.
