@@ -247,7 +247,7 @@ def race_list(racedate):
         #                             )\
         #                             .order_by(+models.ElexRace.statepostal)
 
-        return render_template('race_list.html', **context)
+        return render_template('dashboard.html', **context)
 
     except peewee.OperationalError, e:
         context['error'] = e

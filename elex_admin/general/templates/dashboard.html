@@ -393,26 +393,6 @@ h2 small.accept_ap_calls:after {
 
         $('select.race-call').change(race_call_click);
         $('h2 small').on('click', ap_call_click);
-        // var submit_state = function(data){
-        //     /*
-        //         Submit the current state of a race in the form.
-        //     */
-        //     var statepostal = $(this).attr('data-state');
-        //     var data = {};
-
-        //     data['report'] = $('#state-' + statepostal + ' input.state-report-toggle').prop('checked');
-        //     data['report_description'] = $('#state-' + statepostal + ' textarea.report-description').val()
-
-        //     console.log(data);
-
-        //     $.ajax({
-        //         type: "POST",
-        //         url: '/elections/2016/admin/{{ RACEDATE }}/state/' + statepostal + '/',
-        //         data: data,
-        //         success: function(response){  },
-        //         dataType: 'JSON'
-        //     });
-        // };
 
     });
 </script>
