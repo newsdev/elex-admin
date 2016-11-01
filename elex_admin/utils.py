@@ -1,7 +1,7 @@
 import glob
 import os
 
-CDN_URL = os.environ.get('ELEX_ADMIN_CDN_URL', 'http://int.nyt.com.s3.amazonaws.com/cdn')
+CDN_URL = os.environ.get('ELEX_ADMIN_CDN_URL', 'https://int.nyt.com/cdn')
 
 ELEX_RACE_VIEW_COMMAND = """CREATE OR REPLACE VIEW elex_races as
    SELECT o.*, r.* from races as r

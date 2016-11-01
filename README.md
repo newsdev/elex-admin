@@ -13,7 +13,7 @@ pip install -r requirements.txt
 * This project requires [Adcom](https://github.com/newsdev/adcom) for its theme. You can deploy Adcom to a CDN like Amazon S3 and then specify the root of the URL in an environment variable.
 ```
 export RACEDATE=2016-02-01
-export ELEX_ADMIN_CDN_URL=http://my.cdn.url.s3.amazonaws.com/cdn
+export ELEX_ADMIN_CDN_URL=http://my.cdn.url.com/cdn
 ```
 
 * Run `bootstrap.sh`, `init.sh` and `update.sh` from [elex-loader](https://github.com/newsdev/elex-loader).
