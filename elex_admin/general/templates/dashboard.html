@@ -149,7 +149,7 @@ h2 small.accept_ap_calls:after {
         <strong>NYT call</strong>: 
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
-            {% for c in prez_lean_dem_cands %}
+            {% for c in prez_cands %}
             {% if c.statepostal == state.statepostal and c.raceid == state.raceid %}
             <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
@@ -183,7 +183,7 @@ h2 small.accept_ap_calls:after {
         <strong>NYT call</strong>: 
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
-            {% for c in prez_lean_gop_cands %}
+            {% for c in prez_cands %}
             {% if c.statepostal == state.statepostal and c.raceid == state.raceid %}
             <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
