@@ -18,6 +18,7 @@ class OverrideCandidate(BaseModel):
     candidate_unique_id = CharField(db_column='candidate_unique_id', null=True, primary_key=True)
     nyt_name = CharField(null=True)
     nyt_winner = BooleanField(null=True)
+    nyt_electwon = IntegerField(null=True)
 
     raceid = CharField(null=True)
     statepostal = CharField(null=True)
@@ -55,6 +56,7 @@ class ElexRace(BaseModel):
 class ElexResult(BaseModel):
     nyt_name = CharField(null=True)
     nyt_winner = BooleanField(null=True)
+    nyt_electwon = IntegerField(null=True)
 
     accept_ap_calls = BooleanField(null=True)
     nyt_called = BooleanField(null=True)
