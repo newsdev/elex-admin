@@ -374,6 +374,7 @@ h2 small {
             var candidate_unique_id = $el.children("option:selected" ).val();
             var raceid = $el.parent('p').parent('div').attr('data-raceid');
             var statepostal = $el.parent('p').parent('div').attr('data-statepostal');
+            var reportingunitid = $el.parent('p').parent('div').attr('data-reportingunitid');
             var confirmation = "";
             if (candidate_unique_id == ''){
                 candidate_unique_id = null;
@@ -383,7 +384,7 @@ h2 small {
                 confirmation = "Are you sure you want to call " + statepostal + " for "  + name + "?";
             }
             if (!confirm(confirmation)) { return window.location.reload(); } ;
-            call_race(candidate_unique_id, statepostal + '-' + raceid, $el);
+            call_race(candidate_unique_id, statepostal + '-' + raceid, reportingunitid, $el);
         }
 
         var ap_call_click = function(event) {
