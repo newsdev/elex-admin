@@ -13,6 +13,9 @@ h2 small.accept_ap_calls:after {
     content: "AP calls";
     color: #aaa;
 }
+h2 small {
+    cursor: pointer;
+}
 </style>
 
 <div id="alert-holder"></div>
@@ -57,22 +60,23 @@ h2 small.accept_ap_calls:after {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
+    data-reportingunitid="{{ state.reportingunitid }}"
     style="margin:20px 0;">
 
     <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
-        {{ state.statepostal }}
+        {{ state.state_label }}
         <small{% if state.accept_ap_calls %} class="accept_ap_calls"{% endif %}></small>
     </h2>
 
-    <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
+    <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
 
     <p>
         <strong>NYT call</strong>: 
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in prez_cands %}
-            {% if c.statepostal == state.statepostal and c.raceid == state.raceid %}
-            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
+            {% if c.reportingunitid == state.reportingunitid %}
+            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid  %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
             {% endfor %}
         </select>
@@ -91,6 +95,7 @@ h2 small.accept_ap_calls:after {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
+    data-reportingunitid="{{ state.reportingunitid }}"
     style="margin:20px 0;">
 
     <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
@@ -116,8 +121,8 @@ h2 small.accept_ap_calls:after {
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in senate_swing_cands %}
-            {% if c.race_unique_id == state.race_unique_id %}
-            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id == c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
+            {% if c.reportingunitid == state.reportingunitid %}
+            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
             {% endfor %}
         </select>
@@ -136,22 +141,23 @@ h2 small.accept_ap_calls:after {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
+    data-reportingunitid="{{ state.reportingunitid }}"
     style="margin:20px 0;">
 
     <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
-        {{ state.statepostal }}
+        {{ state.state_label }}
         <small{% if state.accept_ap_calls %} class="accept_ap_calls"{% endif %}></small>
     </h2>
 
-    <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
+    <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
 
     <p>
         <strong>NYT call</strong>: 
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in prez_cands %}
-            {% if c.statepostal == state.statepostal and c.raceid == state.raceid %}
-            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
+            {% if c.reportingunitid == state.reportingunitid %}
+            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
             {% endfor %}
         </select>
@@ -170,22 +176,23 @@ h2 small.accept_ap_calls:after {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
+    data-reportingunitid="{{ state.reportingunitid }}"
     style="margin:20px 0;">
 
     <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
-        {{ state.statepostal }}
+        {{ state.state_label }}
         <small{% if state.accept_ap_calls %} class="accept_ap_calls"{% endif %}></small>
     </h2>
 
-    <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.statepostal == state.statepostal and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.statepostal == state.statepostal and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
+    <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
 
     <p>
         <strong>NYT call</strong>: 
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in prez_cands %}
-            {% if c.statepostal == state.statepostal and c.raceid == state.raceid %}
-            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
+            {% if c.reportingunitid == state.reportingunitid %}
+            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
             {% endfor %}
         </select>
@@ -204,6 +211,7 @@ h2 small.accept_ap_calls:after {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
+    data-reportingunitid="{{ state.reportingunitid }}"
     style="margin:20px 0;">
 
     <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
@@ -229,8 +237,8 @@ h2 small.accept_ap_calls:after {
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in senate_lean_dem_cands %}
-            {% if c.race_unique_id == state.race_unique_id %}
-            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id == c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
+            {% if c.reportingunitid == state.reportingunitid %}
+            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
             {% endfor %}
         </select>
@@ -249,6 +257,7 @@ h2 small.accept_ap_calls:after {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
+    data-reportingunitid="{{ state.reportingunitid }}"
     style="margin:20px 0;">
 
     <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
@@ -274,8 +283,8 @@ h2 small.accept_ap_calls:after {
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in senate_lean_gop_cands %}
-            {% if c.race_unique_id == state.race_unique_id %}
-            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id == c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
+            {% if c.reportingunitid == state.reportingunitid %}
+            <option value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
             {% endfor %}
         </select>
@@ -291,7 +300,7 @@ h2 small.accept_ap_calls:after {
 <script type="text/javascript">
     $(function(){
 
-        var call_race = function(candidate_unique_id, race_unique_id, $el) {
+        var call_race = function(candidate_unique_id, race_unique_id, reportingunitid, $el) {
             /*
             Passes logic for candidate race calling to Python.
             If candidate is null, that means we're uncalling a race.
@@ -300,7 +309,8 @@ h2 small.accept_ap_calls:after {
                 candidate_unique_id: candidate_unique_id,
                 race_unique_id: race_unique_id,
                 statepostal: race_unique_id.split('-')[0],
-                raceid: race_unique_id.split('-')[1]
+                raceid: race_unique_id.split('-')[1],
+                reportingunitid
             }
 
             console.log(data);
@@ -323,7 +333,7 @@ h2 small.accept_ap_calls:after {
             });
         }
 
-        var set_ap = function(accept_ap_calls, raceid, statepostal, officeid, $el) {
+        var set_ap = function(accept_ap_calls, raceid, statepostal, officeid, reportingunitid, $el) {
             /*
             Passes logic for setting AP calls on / off for a particular race.
             Note: There is no "null" setting.
@@ -332,7 +342,8 @@ h2 small.accept_ap_calls:after {
                 accept_ap_calls: accept_ap_calls,
                 raceid: raceid,
                 statepostal: statepostal,
-                officeid: officeid
+                officeid: officeid,
+                reportingunitid: reportingunitid
             };
 
             console.log(data);
@@ -364,10 +375,11 @@ h2 small.accept_ap_calls:after {
             var candidate_unique_id = $el.children("option:selected" ).val();
             var raceid = $el.parent('p').parent('div').attr('data-raceid');
             var statepostal = $el.parent('p').parent('div').attr('data-statepostal');
+            var reportingunitid = $el.parent('p').parent('div').attr('data-reportingunitid');
 
             if (candidate_unique_id == ''){ candidate_unique_id = null };
 
-            call_race(candidate_unique_id, statepostal + '-' + raceid, $el);
+            call_race(candidate_unique_id, statepostal + '-' + raceid, reportingunitid, $el);
 
         }
 
@@ -383,11 +395,12 @@ h2 small.accept_ap_calls:after {
             var raceid = $el.parent('h2').parent('div').attr('data-raceid');
             var statepostal = $el.parent('h2').parent('div').attr('data-statepostal');
             var officeid = $el.parent('h2').parent('div').attr('data-officeid');
+            var reportingunitid = $el.parent('h2').parent('div').attr('data-reportingunitid');
 
             if ($(this).hasClass('accept_ap_calls')) {
-                set_ap(false, raceid, statepostal, officeid, $el);
+                set_ap(false, raceid, statepostal, officeid, reportingunitid, $el);
             } else {
-                set_ap(true, raceid, statepostal, officeid, $el);
+                set_ap(true, raceid, statepostal, officeid, reportingunitid, $el);
             }
         }
 

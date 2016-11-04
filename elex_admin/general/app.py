@@ -18,19 +18,140 @@ from playhouse.postgres_ext import *
 
 import general.models as models
 import general.utils as utils
+from maps import ELECTORAL_VOTES_BY_STATEPOSTAL
 
 app = Flask(__name__)
 app.debug=True
 
-PREZ_SWING = ['FL','PA','OH','NC','VA','WI','CO','IA','NV','NH','AZ','GA','ME-2','NE-2']
-PREZ_DEM = ['DC','HI','MD','VT','CA','NY','MA','RI','NJ','IL','CT','DE','WA','OR','NM','ME','MI','MN','ME-1']
-PREZ_GOP = ['MO','IN','SC','TX','AR','MS','NE','LA','MT','UT','KS','AK','SD','TN','ND','AL','KY','OK','ID','WV','WY','NE-1','NE-3']
+
+# These are reportingunitids since ME/NE have
+# reporting units that are sub-state.
+# Also removes ME/NE the state since the
+# electoral votes are assigned by the reporting
+# unit (e.g., at-large or congressional district 1)
+# rather than at the state level.
+
+PREZ_SWING = [
+    'state-FL-1',
+    'state-PA-1',
+    'state-OH-1',
+    'state-NC-1',
+    'state-VA-1',
+    'state-WI-1',
+    'state-CO-1',
+    'state-IA-1',
+    'state-NV-1',
+    'state-NH-1',
+    'state-AZ-1',
+    'state-GA-1',
+    'district-20027',
+    'district-28007'
+]
+
+PREZ_DEM = [
+    'state-DC-1',
+    'state-HI-1',
+    'state-MD-1',
+    'state-VT-1',
+    'state-CA-1',
+    'state-NY-1',
+    'state-MA-1',
+    'state-RI-1',
+    'state-NJ-1',
+    'state-IL-1',
+    'state-CT-1',
+    'state-DE-1',
+    'state-WA-1',
+    'state-OR-1',
+    'state-NM-1',
+    'state-MI-1',
+    'state-MN-1',
+    'district-20005',
+    'district-20026'
+]
+
+PREZ_GOP = [
+    'state-MO-1',
+    'state-IN-1',
+    'state-SC-1',
+    'state-TX-1',
+    'state-AR-1',
+    'state-MS-1',
+    'state-LA-1',
+    'state-MT-1',
+    'state-UT-1',
+    'state-KS-1',
+    'state-AK-1',
+    'state-SD-1',
+    'state-TN-1',
+    'state-ND-1',
+    'state-AL-1',
+    'state-KY-1',
+    'state-OK-1',
+    'state-ID-1',
+    'state-WV-1',
+    'state-WY-1',
+    'district-28004',
+    'district-28006',
+    'district-28008'
+]
 
 SENATE_SWING = ['WI','IN','NV','NH','PA','NC','MO'] 
 SENATE_GOP = ['FL','AZ','LA','KY','IA','AR','OH','GA','AL','SD','OK','ND','UT','KS','SC','ID','AK']
 SENATE_DEM = ['CA','VT','NY','MD','HI','CT','OR','WA','CO','IL']
 
 ALL_STATES = [x for x in SENATE_SWING + SENATE_GOP + SENATE_DEM]
+
+
+@app.route('/elections/2016/admin/<racedate>/archive/')
+def archive_list(racedate):
+    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
+        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
+        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
+    )
+    models.database_proxy.initialize(racedate_db)
+    context = utils.build_context(racedate)
+    context['files'] = sorted(
+        [
+            {
+                "name": f.split('/')[-1],
+                "date": datetime.datetime.fromtimestamp(float(f.split('/')[-1].split('-')[-1].split('.json')[0]))
+            }
+            for f in glob.glob('/tmp/%s/*.json' % racedate)
+        ],
+        key=lambda x:x,
+        reverse=True
+    )[:750]
+
+    context['states'] = []
+
+    state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+
+    for state in state_list:
+        race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
+        state_dict = {}
+        state_dict['statepostal'] = state
+        state_dict['report'] = race.report
+        state_dict['report_description'] = race.report_description
+        context['states'].append(state_dict)
+
+    return render_template('archive_list.html', **context)
+
+@app.route('/elections/2016/admin/<racedate>/archive/<filename>')
+def archive_detail(racedate, filename):
+    with open('/tmp/%s/%s' % (racedate, filename), 'r') as readfile:
+        return readfile.read()
+
+
+@app.route('/elections/2016/admin/<racedate>/loader/timeout/', methods=['POST'])
+def set_loader_timeout(racedate):
+    if request.method == 'POST':
+        payload = utils.clean_payload(dict(request.form))
+
+        timeout = payload.get('timeout', '')
+        os.system('echo export ELEX_LOADER_TIMEOUT=%s > /tmp/elex_loader_timeout.sh' % timeout)
+
+        return json.dumps({"message": "success", "output": "0"})
 
 
 @app.route('/elections/2016/admin/<racedate>/actions/call-race/', methods=['POST'])
@@ -43,6 +164,24 @@ def action_call_race(racedate):
         models.database_proxy.initialize(racedate_db)
 
         payload = utils.clean_payload(dict(request.form))
+
+        payload['nyt_electwon'] = ELECTORAL_VOTES_BY_STATEPOSTAL[payload['statepostal']]
+
+        UPDATE_PREZ_LOSERS = """
+            UPDATE override_candidates
+                SET nyt_winner = False,nyt_electwon = 0
+                    WHERE reportingunitid = '%(reportingunitid)s'
+                    AND raceid = '%(raceid)s'
+        """ % payload
+
+        UPDATE_PREZ_WINNER = """
+            UPDATE override_candidates
+                SET nyt_winner = True,nyt_electwon = %(nyt_electwon)s
+                    WHERE statepostal = '%(statepostal)s'
+                    AND raceid = '%(raceid)s'
+                    AND candidate_unique_id = '%(candidate_unique_id)s'
+                    AND reportingunitid = '%(reportingunitid)s'
+            """ % payload
 
         UPDATE_LOSERS = """
             UPDATE override_candidates
@@ -61,18 +200,27 @@ def action_call_race(racedate):
 
         SET_RACE_TRUE = """
             UPDATE override_races SET nyt_called = True
-                where race_unique_id = '%(statepostal)s-%(raceid)s'
+                WHERE race_unique_id = '%(statepostal)s-%(raceid)s'
+                AND reportingunitid = '%(reportingunitid)s'
         """ % payload
 
         SET_RACE_FALSE = """
             UPDATE override_races SET nyt_called = False
-                where race_unique_id = '%(statepostal)s-%(raceid)s'
+                WHERE race_unique_id = '%(statepostal)s-%(raceid)s'
+                AND reportingunitid = '%(reportingunitid)s'
         """ % payload
 
-        models.database_proxy.execute_sql(UPDATE_LOSERS)
+        if payload['raceid'] == '0':
+            models.database_proxy.execute_sql(UPDATE_PREZ_LOSERS)
+        else:
+            models.database_proxy.execute_sql(UPDATE_LOSERS)
 
         if payload['candidate_unique_id']:
-            models.database_proxy.execute_sql(UPDATE_WINNER)
+            if payload['raceid'] == '0':
+                models.database_proxy.execute_sql(UPDATE_PREZ_WINNER)
+            else:
+                models.database_proxy.execute_sql(UPDATE_WINNER)
+
             models.database_proxy.execute_sql(SET_RACE_TRUE)
         else:
             models.database_proxy.execute_sql(SET_RACE_FALSE)
@@ -96,7 +244,8 @@ def action_ap(racedate):
             UPDATE override_races
                 SET accept_ap_calls = %(accept_ap_calls)s
                     WHERE raceid = '%(raceid)s'
-                    AND statepostal = '%(statepostal)s';""" % payload
+                    AND statepostal = '%(statepostal)s'
+                    AND reportingunitid = '%(reportingunitid)s';""" % payload
 
         models.database_proxy.execute_sql(UPDATE_QUERY)
         models.database_proxy.execute_sql(utils.ELEX_RACE_VIEW_COMMAND)
@@ -122,47 +271,65 @@ def race_list(racedate):
         context['states'] = sorted(ALL_STATES, key=lambda x:x)
 
         try:
-            context['ap_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select().where(models.ElexResult.officeid << ["P","S"],models.ElexResult.level == 'state',models.ElexResult.winner == True)]
+            context['ap_winners'] = [{'reportingunitid': w.reportingunitid, 'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select(models.ElexResult.reportingunitid, models.ElexResult.statepostal, models.ElexResult.raceid, models.ElexResult.candidate_unique_id).distinct().where(models.ElexResult.officeid << ["P","S"],models.ElexResult.level << ['state','district'],models.ElexResult.winner == True)]
         except models.ElexResult.DoesNotExist:
             context['ap_winners'] = []
 
         try:
-            context['nyt_winners'] = [{'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select().where(models.ElexResult.officeid << ["P","S"],models.ElexResult.level == 'state',models.ElexResult.nyt_winner == True)]
+            context['nyt_winners'] = [{'reportingunitid': w.reportingunitid, 'statepostal': w.statepostal, 'raceid': w.raceid, 'candidate_unique_id': w.candidate_unique_id} for w in models.ElexResult.select(models.ElexResult.reportingunitid, models.ElexResult.statepostal, models.ElexResult.raceid, models.ElexResult.candidate_unique_id).where(models.ElexResult.officeid << ["P","S"],models.ElexResult.level << ['state','district'],models.ElexResult.nyt_winner == True)]
         except models.ElexResult.DoesNotExist:
             context['nyt_winners'] = []
 
-        context['prez_cands'] = models.ElexResult\
-                                    .select()\
+        context['prez_cands'] = [e for e in models.ElexResult\
+                                    .select().distinct()\
                                     .where(
-                                        models.ElexResult.officeid == "P",
+                                        models.ElexResult.raceid == "0",
                                         models.ElexResult.level == "state",
                                         models.ElexResult.party << ['Dem', 'GOP']
-                                    )\
-                                    .order_by(+models.ElexResult.statepostal)
+                                    )]
 
-        context['prez_swing'] = models.ElexRace\
+        for e in models.ElexResult\
+                        .select(
+                            models.ElexResult.raceid,
+                            models.ElexResult.party,
+                            models.ElexResult.level,
+                            models.ElexResult.reportingunitid,
+                            models.ElexResult.last,
+                            models.ElexResult.first,
+                            models.ElexResult.candidate_unique_id
+                        ).distinct()\
+                        .where(
+                            models.ElexResult.raceid == "0",
+                            models.ElexResult.level == "district",
+                            models.ElexResult.party << ['Dem', 'GOP']
+                        ):
+                            context['prez_cands'].append(e)
+
+        context['prez_cands'] = sorted([e for e in context['prez_cands']], key=lambda x: x.statepostal)
+
+        context['prez_swing'] = models.OverrideRace\
                                     .select()\
                                     .where(
-                                        models.ElexRace.officeid == "P",
-                                        models.ElexRace.statepostal << PREZ_SWING
+                                        models.OverrideRace.raceid == "0",
+                                        models.OverrideRace.reportingunitid << PREZ_SWING
                                     )\
-                                    .order_by(+models.ElexRace.statepostal)
+                                    .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
 
-        context['prez_lean_gop'] = models.ElexRace\
+        context['prez_lean_gop'] = models.OverrideRace\
                                     .select()\
                                     .where(
-                                        models.ElexRace.officeid == "P",
-                                        models.ElexRace.statepostal << PREZ_GOP
+                                        models.OverrideRace.raceid == "0",
+                                        models.OverrideRace.reportingunitid << PREZ_GOP
                                     )\
-                                    .order_by(+models.ElexRace.statepostal)
+                                    .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
 
-        context['prez_lean_dem'] = models.ElexRace\
+        context['prez_lean_dem'] = models.OverrideRace\
                                     .select()\
                                     .where(
-                                        models.ElexRace.officeid == "P",
-                                        models.ElexRace.statepostal << PREZ_DEM
+                                        models.OverrideRace.raceid == "0",
+                                        models.OverrideRace.reportingunitid << PREZ_DEM
                                     )\
-                                    .order_by(+models.ElexRace.statepostal)
+                                    .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
 
         context['senate_swing'] = models.ElexRace\
                                     .select()\
@@ -222,31 +389,6 @@ def race_list(racedate):
                                     )\
                                     .order_by(+models.ElexResult.statepostal)
 
-
-        # context['house'] = models.ElexRace\
-        #                             .select()\
-        #                             .where(
-        #                                 models.ElexRace.national == True,
-        #                                 models.ElexRace.officeid == "H"
-        #                             )\
-        #                             .order_by(+models.ElexRace.statepostal)
-
-        # context['governor'] = models.ElexRace\
-        #                             .select()\
-        #                             .where(
-        #                                 models.ElexRace.national == True,
-        #                                 models.ElexRace.officeid == "G"
-        #                             )\
-        #                             .order_by(+models.ElexRace.statepostal)
-
-        # context['other_races'] = models.ElexRace\
-        #                             .select()\
-        #                             .where(
-        #                                 ~(models.ElexRace.id << context['national_races']), 
-        #                                 ~(models.ElexRace.id << context['presidential_races']), 
-        #                             )\
-        #                             .order_by(+models.ElexRace.statepostal)
-
         return render_template('dashboard.html', **context)
 
     except peewee.OperationalError, e:
@@ -256,241 +398,6 @@ def race_list(racedate):
     except peewee.ProgrammingError, e:
         context['error'] = e
         return render_template('error.html', **context)
-
-# @app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
-# def scripts(racedate, script_type):
-#     base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
-#     if request.method == 'GET':
-#         o = "1"
-
-#         if script_type == 'bake':
-#             pass
-#         else:
-#             o = os.system('%s./scripts/prd/%s.sh %s' % (base_command, script_type, racedate))
-
-#         return json.dumps({"message": "success", "output": o})
-
-# @app.route('/elections/2016/admin/<racedate>/csv/', methods=['POST'])
-# def overrides_post(racedate):
-#     if request.method == 'POST':
-#         payload = dict(request.form)
-#         candidates_text = None
-#         races_text = None
-
-#         if payload.get('candidates_text', None):
-#             candidates_text = str(payload['candidates_text'][0])
-
-#         if payload.get('races_text', None):
-#             races_text = str(payload['races_text'][0])
-
-#         if races_text:
-#             with open('../elex-loader/overrides/%s_override_races.csv' % racedate, 'w') as writefile:
-#                 writefile.write(races_text)
-
-#         if candidates_text:
-#             with open('../elex-loader/overrides/%s_override_candidates.csv' % racedate, 'w') as writefile:
-#                 writefile.write(candidates_text)
-
-#         return json.dumps({"message": "success"})
-
-# @app.route('/elections/2016/admin/<racedate>/csv/<override>/', methods=['GET'])
-# def overrides_csv(racedate, override):
-#     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-#         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-#         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-#     )
-#     models.database_proxy.initialize(racedate_db)
-#     if request.method == 'GET':
-#         output = ''
-
-#         if override == 'race':
-#             objs = [r.serialize() for r in models.OverrideRace.select()]
-
-#         if override == 'candidate':
-#             objs = [r.serialize() for r in models.OverrideCandidate.select()]
-
-#         output = io.BytesIO()
-#         fieldnames = [unicode(k) for k in objs[0].keys()]
-#         writer = py2.CSVKitDictWriter(output, fieldnames=list(fieldnames))
-#         writer.writeheader()
-#         writer.writerows(objs)
-#         output = make_response(output.getvalue())
-#         output.headers["Content-Disposition"] = "attachment; filename=override_%ss.csv" % override
-#         output.headers["Content-type"] = "text/csv"
-#         return output
-
-# @app.route('/elections/2016/admin/<racedate>/state/<statepostal>/', methods=['POST'])
-# def state_detail(racedate, statepostal):
-#     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-#         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-#         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-#     )
-#     models.database_proxy.initialize(racedate_db)
-#     if request.method == 'POST':
-#         payload = utils.clean_payload(dict(request.form))
-#         races = ["%s-%s" % (r.statepostal, r.raceid) for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
-#         for r in races:
-#             o = models.OverrideRace.get(
-#                     models.OverrideRace.race_raceid == r.split('-')[1],
-#                     models.OverrideRace.race_statepostal == r.split('-')[0]
-#             )
-#             o.report=payload['report']
-#             o.report_description=payload['report_description']
-#             o.save()
-
-#         utils.update_views(models.database_proxy)
-
-#         return json.dumps({"message": "success"})
-
-# @app.route('/elections/2016/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
-# def race_detail(racedate,raceid):
-#     if request.method == 'GET':
-#         try:
-#             racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-#                     user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-#                     host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-#             )
-#             models.database_proxy.initialize(racedate_db)
-#             context = utils.build_context(racedate)
-#             context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid.split('-')[1], models.ElexRace.statepostal == raceid.split('-')[0])
-#             context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(raceid)), key=lambda x:x.nyt_display_order)
-
-#             context['ap_winner'] = None
-#             ap_winner = models.ElexResult.select().where(
-#                                             models.ElexResult.raceid == raceid.split('-')[1],
-#                                             models.ElexResult.statepostal == raceid.split('-')[0], 
-#                                             models.ElexResult.winner == True
-#             )
-#             if len(ap_winner) > 0:
-#                 context['ap_winner'] = ap_winner[0]
-
-#             context['states'] = []
-
-#             state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
-
-#             for state in state_list:
-#                 race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
-#                 state_dict = {}
-#                 state_dict['statepostal'] = state
-#                 state_dict['report'] = race.report
-#                 state_dict['report_description'] = race.report_description
-#                 context['states'].append(state_dict)
-
-#             return render_template('race_detail.html', **context)
-
-#         except peewee.OperationalError, e:
-#             context['error'] = e
-#             return render_template('error.html', **context)
-
-#     if request.method == 'POST':
-#         racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-#             user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-#             host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-#         )
-#         models.database_proxy.initialize(racedate_db)
-#         payload = utils.clean_payload(dict(request.form))
-#         try:
-#             r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid.split('-')[1], models.OverrideRace.race_statepostal == raceid.split('-')[0])
-#         except models.OverrideRace.DoesNotExist:
-#             r = models.OverrideRace.create(race_raceid=raceid.split('-')[1], race_statepostal=raceid.split('-')[0])
-
-#         print payload
-
-#         utils.set_winner(payload['nyt_winner'], raceid)
-
-#         utils.update_model(r, payload)
-#         utils.update_views(models.database_proxy)
-
-#         return json.dumps({"message": "success"})
-
-# @app.route('/elections/2016/admin/<racedate>/candidateorder/', methods=['POST'])
-# def candidate_order(racedate):
-#     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-#         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-#         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-#     )
-#     models.database_proxy.initialize(racedate_db)
-#     if request.method == 'POST':
-#         payload = utils.clean_payload(dict(request.form))
-
-#         if payload.get('candidates', None):
-#             print payload['candidates']
-#             for idx, candidateid in enumerate(payload['candidates'].split(',')):
-#                 oc = models.OverrideCandidate.update(nyt_display_order=idx).where(models.OverrideCandidate.candidate_candidateid == candidateid)
-#                 oc.execute()
-
-#         utils.update_views(models.database_proxy)
-
-#         return json.dumps({"message": "success"})
-
-# @app.route('/elections/2016/admin/<racedate>/candidate/<candidateid>/', methods=['POST'])
-# def candidate_detail(racedate, candidateid):
-#     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-#         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-#         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-#     )
-#     models.database_proxy.initialize(racedate_db)
-#     if request.method == 'POST':
-#         payload = utils.clean_payload(dict(request.form))
-
-#         try:
-#             oc = models.OverrideCandidate.get(models.OverrideCandidate.candidate_candidateid == candidateid)
-#         except models.OverrideCandidate.DoesNotExist:
-#             oc = models.OverrideCandidate.create(candidate_candidateid=candidateid)
-
-#         utils.update_model(oc, payload)
-#         utils.update_views(models.database_proxy)
-
-#         return json.dumps({"message": "success"})
-
-# @app.route('/elections/2016/admin/<racedate>/loader/timeout/', methods=['POST'])
-# def set_loader_timeout(racedate):
-#     if request.method == 'POST':
-#         payload = utils.clean_payload(dict(request.form))
-
-#         timeout = payload.get('timeout', '')
-#         os.system('echo export ELEX_LOADER_TIMEOUT=%s > /tmp/elex_loader_timeout.sh' % timeout)
-
-#         return json.dumps({"message": "success", "output": "0"})
-
-# @app.route('/elections/2016/admin/<racedate>/archive/')
-# def archive_list(racedate):
-#     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-#         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-#         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-#     )
-#     models.database_proxy.initialize(racedate_db)
-#     context = utils.build_context(racedate)
-#     context['files'] = sorted(
-#         [
-#             {
-#                 "name": f.split('/')[-1],
-#                 "date": datetime.datetime.fromtimestamp(float(f.split('/')[-1].split('-')[-1].split('.json')[0]))
-#             }
-#             for f in glob.glob('/tmp/%s/*.json' % racedate)
-#         ],
-#         key=lambda x:x,
-#         reverse=True
-#     )[:750]
-
-#     context['states'] = []
-
-#     state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
-
-#     for state in state_list:
-#         race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
-#         state_dict = {}
-#         state_dict['statepostal'] = state
-#         state_dict['report'] = race.report
-#         state_dict['report_description'] = race.report_description
-#         context['states'].append(state_dict)
-
-#     return render_template('archive_list.html', **context)
-
-# @app.route('/elections/2016/admin/<racedate>/archive/<filename>')
-# def archive_detail(racedate, filename):
-#     with open('/tmp/%s/%s' % (racedate, filename), 'r') as readfile:
-#         return readfile.read()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

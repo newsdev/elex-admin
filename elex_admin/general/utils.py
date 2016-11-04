@@ -5,15 +5,16 @@ CDN_URL = os.environ.get('ELEX_ADMIN_CDN_URL', 'https://int.nyt.com/cdn')
 
 ELEX_RACE_VIEW_COMMAND = """
 CREATE OR REPLACE VIEW elex_races AS
-    SELECT r.raceid, r.statepostal, r.officeid, r.national, o.race_unique_id, o.accept_ap_calls
+    SELECT r.raceid, r.reportingunitid, r.statepostal, r.officeid, r.national, o.race_unique_id, o.accept_ap_calls 
         FROM results AS r
-            LEFT JOIN override_races AS o ON o.raceid = r.raceid AND o.statepostal = r.statepostal
-            GROUP BY r.raceid, r.statepostal, r.officeid, r.national, o.race_unique_id, o.accept_ap_calls
+            LEFT JOIN override_races AS o ON o.raceid = r.raceid AND o.statepostal = r.statepostal AND o.reportingunitid = r.reportingunitid
+            WHERE r.level IN ('state', 'district')
+            GROUP BY r.raceid, r.reportingunitid, r.statepostal, r.officeid, r.national, o.race_unique_id, o.accept_ap_calls
 ;"""
 
 ELEX_RESULTS_VIEW_COMMAND = """
 CREATE OR REPLACE VIEW elex_results as
-    SELECT orace.race_unique_id, orace.report, orace.nyt_race_name, orace.nyt_race_description, orace.accept_ap_calls, orace.nyt_called, ocand.nyt_winner,ocand.nyt_name, result.* FROM results as result
+    SELECT orace.race_unique_id, orace.report, orace.nyt_race_name, orace.nyt_race_description, orace.accept_ap_calls, orace.nyt_called, ocand.nyt_winner,ocand.nyt_name, ocand.nyt_electwon, result.* FROM results as result
         JOIN override_candidates as ocand on result.candidate_unique_id = ocand.candidate_unique_id and result.statepostal = ocand.statepostal and result.raceid = ocand.raceid
         JOIN override_races as orace on orace.statepostal = result.statepostal and orace.raceid = result.raceid
 ;"""

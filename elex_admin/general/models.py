@@ -5,7 +5,7 @@ from peewee import *
 from playhouse.postgres_ext import *
 
 import general.utils as utils
-
+from maps import PREZ_REPORTING_UNIT_TO_DISTRICT_LABELS
 
 database_proxy = Proxy()
 
@@ -20,6 +20,7 @@ class OverrideCandidate(BaseModel):
     nyt_winner = BooleanField(null=True)
     nyt_electwon = IntegerField(null=True)
 
+    reportingunitid = CharField(null=True)
     raceid = CharField(null=True)
     statepostal = CharField(null=True)
 
@@ -35,16 +36,25 @@ class OverrideRace(BaseModel):
     race_unique_id = TextField(db_column='race_unique_id', null=True, primary_key=True)
     report = BooleanField(null=True)
 
+    reportingunitid = CharField(null=True)
     raceid = CharField(null=True)
     statepostal = CharField(null=True)
 
     class Meta:
         db_table = 'override_races'
 
+    @property
+    def state_label(self):
+        if "district" in self.reportingunitid:
+            return PREZ_REPORTING_UNIT_TO_DISTRICT_LABELS[self.reportingunitid]['label']
+        return self.statepostal
+
 class ElexRace(BaseModel):
-    accept_ap_calls = BooleanField(null=True)
     raceid = CharField(null=True)
+    reportingunitid = CharField(null=True)
     statepostal = CharField(null=True)
+
+    accept_ap_calls = BooleanField(null=True)
     officeid = CharField(null=True)
     national = BooleanField(null=True)
     race_unique_id = TextField(db_column='race_unique_id', null=True, primary_key=True)
