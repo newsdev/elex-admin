@@ -371,16 +371,19 @@ h2 small {
             Note: These are usually states.
             */
             $el = $(this)
-
             var candidate_unique_id = $el.children("option:selected" ).val();
             var raceid = $el.parent('p').parent('div').attr('data-raceid');
             var statepostal = $el.parent('p').parent('div').attr('data-statepostal');
-            var reportingunitid = $el.parent('p').parent('div').attr('data-reportingunitid');
-
-            if (candidate_unique_id == ''){ candidate_unique_id = null };
-
-            call_race(candidate_unique_id, statepostal + '-' + raceid, reportingunitid, $el);
-
+            var confirmation = "";
+            if (candidate_unique_id == ''){
+                candidate_unique_id = null;
+                confirmation = "Are you sure you uncall " + statepostal + "?";
+            } else {
+                var name = $el.children("option:selected" ).text();
+                confirmation = "Are you sure you want to call " + statepostal + " for "  + name + "?";
+            }
+            if (!confirm(confirmation)) { return window.location.reload(); } ;
+            call_race(candidate_unique_id, statepostal + '-' + raceid, $el);
         }
 
         var ap_call_click = function(event) {
