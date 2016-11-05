@@ -255,6 +255,9 @@ def action_ap(racedate):
 @app.route('/elections/2016/admin/<racedate>/')
 def race_list(racedate):
     context = utils.build_context(racedate)
+
+    context['SLACK_WEBHOOK_URL'] = os.environ.get('SLACK_WEBHOOK_URL', None)
+
     context['prez_swing'] = []
     context['prez_other'] = []
     context['senate'] = []
