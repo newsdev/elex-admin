@@ -165,7 +165,12 @@ def action_call_race(racedate):
 
         payload = utils.clean_payload(dict(request.form))
 
-        payload['nyt_electwon'] = ELECTORAL_VOTES_BY_STATEPOSTAL[payload['statepostal']]
+        if payload['statepostal'] in ['ME', 'NE']:
+            payload['nyt_electwon'] = ELECTORAL_VOTES_BY_STATEPOSTAL[payload['reportingunitid']]
+        else:
+            payload['nyt_electwon'] = ELECTORAL_VOTES_BY_STATEPOSTAL[payload['statepostal']]
+
+        print payload['nyt_electwon']
 
         UPDATE_PREZ_LOSERS = """
             UPDATE override_candidates
