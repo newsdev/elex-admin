@@ -169,45 +169,47 @@ def action_call_race(racedate):
 
         UPDATE_PREZ_LOSERS = """
             UPDATE override_candidates
-                SET nyt_winner = False,nyt_electwon = 0
+                SET nyt_winner = FALSE, nyt_electwon = 0
                     WHERE reportingunitid = '%(reportingunitid)s'
-                    AND raceid = '%(raceid)s'
+                    AND raceid = '%(raceid)s';
         """ % payload
 
         UPDATE_PREZ_WINNER = """
             UPDATE override_candidates
-                SET nyt_winner = True,nyt_electwon = %(nyt_electwon)s
+                SET nyt_winner = TRUE, nyt_electwon = %(nyt_electwon)s
                     WHERE statepostal = '%(statepostal)s'
                     AND raceid = '%(raceid)s'
                     AND candidate_unique_id = '%(candidate_unique_id)s'
-                    AND reportingunitid = '%(reportingunitid)s'
+                    AND reportingunitid = '%(reportingunitid)s';
             """ % payload
 
         UPDATE_LOSERS = """
             UPDATE override_candidates
-                SET nyt_winner = False
+                SET nyt_winner = FALSE
                     WHERE statepostal = '%(statepostal)s'
-                    AND raceid = '%(raceid)s'
+                    AND raceid = '%(raceid)s';
         """ % payload
 
         UPDATE_WINNER = """
             UPDATE override_candidates
-                SET nyt_winner = True
+                SET nyt_winner = TRUE
                     WHERE statepostal = '%(statepostal)s'
                     AND raceid = '%(raceid)s'
-                    AND candidate_unique_id = '%(candidate_unique_id)s'
+                    AND candidate_unique_id = '%(candidate_unique_id)s';
             """ % payload
 
         SET_RACE_TRUE = """
-            UPDATE override_races SET nyt_called = True
-                WHERE race_unique_id = '%(statepostal)s-%(raceid)s'
-                AND reportingunitid = '%(reportingunitid)s'
+            UPDATE override_races 
+                SET nyt_called = TRUE
+                    WHERE race_unique_id = '%(statepostal)s-%(raceid)s'
+                    AND reportingunitid = '%(reportingunitid)s';
         """ % payload
 
         SET_RACE_FALSE = """
-            UPDATE override_races SET nyt_called = False
-                WHERE race_unique_id = '%(statepostal)s-%(raceid)s'
-                AND reportingunitid = '%(reportingunitid)s'
+            UPDATE override_races 
+                SET nyt_called = FALSE
+                    WHERE race_unique_id = '%(statepostal)s-%(raceid)s'
+                    AND reportingunitid = '%(reportingunitid)s';
         """ % payload
 
         if payload['raceid'] == '0':
