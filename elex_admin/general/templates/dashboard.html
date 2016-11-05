@@ -347,7 +347,7 @@ h2 small {
                     $.ajax({
                       type: 'POST',
                       json: true,
-                      url: {{ SLACK_WEBHOOK_URL }},
+                      url: '{{ SLACK_WEBHOOK_URL }}',
                       data: JSON.stringify({
                         text: ':siren: <!here> ' + message,
                         channel: env === 'prd' ? '#race-calls' : '#race-calls-test',
