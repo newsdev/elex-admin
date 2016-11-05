@@ -55,7 +55,7 @@ h2 small {
 
 <div class="row">
 {% for state in prez_swing %}
-<div 
+<div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
@@ -71,7 +71,7 @@ h2 small {
     <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
 
     <p>
-        <strong>NYT call</strong>: 
+        <strong>NYT call</strong>:
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in prez_cands %}
@@ -90,7 +90,7 @@ h2 small {
 
 <div class="row">
 {% for state in senate_swing %}
-<div 
+<div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
@@ -117,7 +117,7 @@ h2 small {
     </p>
 
     <p>
-        <strong>NYT call</strong>: 
+        <strong>NYT call</strong>:
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in senate_swing_cands %}
@@ -136,7 +136,7 @@ h2 small {
 
 <div class="row">
 {% for state in prez_lean_dem %}
-<div 
+<div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
@@ -152,7 +152,7 @@ h2 small {
     <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
 
     <p>
-        <strong>NYT call</strong>: 
+        <strong>NYT call</strong>:
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in prez_cands %}
@@ -171,7 +171,7 @@ h2 small {
 
 <div class="row">
 {% for state in prez_lean_gop %}
-<div 
+<div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
@@ -187,7 +187,7 @@ h2 small {
     <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
 
     <p>
-        <strong>NYT call</strong>: 
+        <strong>NYT call</strong>:
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in prez_cands %}
@@ -206,7 +206,7 @@ h2 small {
 
 <div class="row">
 {% for state in senate_lean_dem %}
-<div 
+<div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
@@ -233,7 +233,7 @@ h2 small {
     </p>
 
     <p>
-        <strong>NYT call</strong>: 
+        <strong>NYT call</strong>:
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in senate_lean_dem_cands %}
@@ -252,7 +252,7 @@ h2 small {
 
 <div class="row">
 {% for state in senate_lean_gop %}
-<div 
+<div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
@@ -279,7 +279,7 @@ h2 small {
     </p>
 
     <p>
-        <strong>NYT call</strong>: 
+        <strong>NYT call</strong>:
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in senate_lean_gop_cands %}
@@ -328,6 +328,32 @@ h2 small {
                         $el.parent('div').children('a').removeClass('winner');
                         console.log(response);
                     }
+
+                    // look up racetype + winner
+                    var called = !!data.candidate_unique_id;
+                    var raceType = $el.closest('.row').prev().text().split(':')[0];
+                    var qualifier = raceType === 'President' ? ' ' : 'the ' + raceType + ' race in ';
+                    var message = null;
+                    if (called) {
+                      var winner = $el.children('option:selected').text();
+                      // generate the message
+                      message = 'NYT has called ' + qualifier + data.statepostal + ' for ' + winner;
+                    } else {
+                      message = '*UNCALLED RACE* :siren: NYT has _UNCALLED_ ' + qualifier;
+                    }
+
+                    var env = window.location.host.split('-')[2];
+                    // make request to slack
+                    $.ajax({
+                      type: 'POST',
+                      json: true,
+                      url: {{ SLACK_WEBHOOK_URL }},
+                      data: JSON.stringify({
+                        text: ':siren: <!here> ' + message,
+                        channel: env === 'prd' ? '#race-calls' : '#race-calls-test',
+                        username: 'NYT Race Calls'
+                      })
+                    });
                 },
                 dataType: 'JSON'
             });
