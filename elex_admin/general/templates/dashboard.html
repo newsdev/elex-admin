@@ -332,14 +332,14 @@ h2 small {
                     // look up racetype + winner
                     var called = !!data.candidate_unique_id;
                     var raceType = $el.closest('.row').prev().text().split(':')[0];
-                    var qualifier = raceType === 'President' ? ' ' : 'the ' + raceType + ' race in ';
+                    var qualifier = raceType === 'President' ? '' : 'the ' + raceType + ' race in ';
                     var message = null;
                     if (called) {
                       var winner = $el.children('option:selected').text();
                       // generate the message
                       message = 'NYT has called ' + qualifier + data.statepostal + ' for ' + winner;
                     } else {
-                      message = '*UNCALLED RACE* :siren: NYT has _UNCALLED_ ' + qualifier;
+                      message = '*UNCALLED RACE* :siren: NYT has _UNCALLED_ ' + qualifier + data.statepostal;
                     }
 
                     var env = window.location.host.split('-')[2];
