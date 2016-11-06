@@ -96,7 +96,7 @@ PREZ_STATE_TO_LABEL = {
     "CA": "California",
     "CO": "Colorado",
     "CT": "Connecticut",
-    "DC": "District of Columbia",
+    "DC": "D.C.",
     "DE": "Delaware",
     "FL": "Florida",
     "GA": "Georgia",
