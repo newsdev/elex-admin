@@ -101,7 +101,7 @@ table td strong {
             <td><strong>NYT call</strong></td>
             <td>
                 <select class="race-call">
-                    <option value="">-- Call race --</option>
+                    <option value="">-- No winner --</option>
                     {% for c in prez_cands %}
                     {% if c.reportingunitid == state.reportingunitid %}
                     <option data-full-name="{{ c.first }} {{ c.last }}" value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid  %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
@@ -155,7 +155,7 @@ table td strong {
             <td><strong>NYT call</strong></td>
             <td>
                 <select class="race-call">
-                    <option value="">-- Call race --</option>
+                    <option value="">-- No winner --</option>
                     {% for c in senate_swing_cands %}
                     {% if c.reportingunitid == state.reportingunitid %}
                     <option data-full-name="{{ c.first }} {{ c.last }}" value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% else %}I{% endif %})</option>
@@ -197,7 +197,7 @@ table td strong {
             <td><strong>NYT call</strong></td>
             <td>
                 <select class="race-call">
-                    <option value="">-- Call race --</option>
+                    <option value="">-- No winner --</option>
                     {% for c in prez_cands %}
                     {% if c.reportingunitid == state.reportingunitid %}
                     <option data-full-name="{{ c.first }} {{ c.last }}" value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% else %}I{% endif %})</option>
@@ -251,7 +251,7 @@ table td strong {
             <td><strong>NYT call</strong></td>
             <td>
                 <select class="race-call">
-                    <option value="">-- Call race --</option>
+                    <option value="">-- No winner --</option>
                     {% for c in senate_other_cands %}
                     {% if c.reportingunitid == state.reportingunitid %}
                     <option data-full-name="{{ c.first }} {{ c.last }}" value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
