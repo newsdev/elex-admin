@@ -289,6 +289,21 @@ table td strong {
 <script type="text/javascript">
     $(function(){
 
+        var pop_alert = function(headline, success){
+            /*
+                Message should have a key "output" that is a string.
+            */
+            message_text = "Failed; please check the logs."
+            if (success == "0") {
+                message_text = "Success."
+            }
+            var alert_text = '<div class="alert alert-danger" role="alert"><strong>'+ headline + '</strong>: ' + message_text + ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+            $('#alert-holder').html(alert_text);
+            if (success == "0") {
+                $('#alert-holder .alert').removeClass('alert-danger').addClass('alert-success')
+            }
+        }
+
         var run_server_script = function(data){
             /*
                 Hit the route for running one of these three server scripts.
@@ -299,6 +314,8 @@ table td strong {
                 url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
                 success: function(response){ 
                     pop_alert(script_type, response.output);
+                    console.log(script_type);
+                    console.log(response);
                 },
                 dataType: 'JSON'
             });
