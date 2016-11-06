@@ -292,8 +292,9 @@ def race_list(racedate):
                                     .where(
                                         models.ElexResult.raceid == "0",
                                         models.ElexResult.level == "state",
-                                        models.ElexResult.party << ['Dem', 'GOP']
+                                        models.ElexResult.party << ['Dem', 'GOP', 'Una']
                                     )]
+
 
         for e in models.ElexResult\
                         .select(
@@ -308,7 +309,7 @@ def race_list(racedate):
                         .where(
                             models.ElexResult.raceid == "0",
                             models.ElexResult.level == "district",
-                            models.ElexResult.party << ['Dem', 'GOP']
+                            models.ElexResult.party << ['Dem', 'GOP', 'Una']
                         ):
                             context['prez_cands'].append(e)
 
