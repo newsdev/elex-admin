@@ -289,6 +289,35 @@ table td strong {
 <script type="text/javascript">
     $(function(){
 
+        var run_server_script = function(data){
+            /*
+                Hit the route for running one of these three server scripts.
+            */
+            var script_type = $(this).attr('data-script');
+            $.ajax({
+                type: "GET",
+                url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
+                success: function(response){ 
+                    pop_alert(script_type, response.output);
+                },
+                dataType: 'JSON'
+            });
+        }
+        var set_loader_timeout = function(data){
+            var timeout = $('#value-timeout').val();
+            data = {};
+            data['timeout'] = timeout;
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/elections/2016/admin/{{ RACEDATE }}/loader/timeout/',
+                success: function(response){
+                    pop_alert("Set timeout", response.output);
+                },
+                dataType: 'JSON'
+            })
+        }
+
         var call_race = function(candidate_unique_id, race_unique_id, reportingunitid, $el) {
             /*
             Passes logic for candidate race calling to Python.
@@ -434,6 +463,8 @@ table td strong {
 
         $('select.race-call').change(race_call_click);
         $('h2 small').on('click', ap_call_click);
+        $('button.script').on('click', run_server_script);
+        $('#set-timeout').on('click', set_loader_timeout);
 
         // @TODO: Remove this from global scope later.
         window.callRaceTest_removeMe = call_race;
