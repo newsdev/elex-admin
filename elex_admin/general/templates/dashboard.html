@@ -417,17 +417,24 @@ table td strong {
             var statepostal = $el.parent('h2').parent('div').attr('data-statepostal');
             var officeid = $el.parent('h2').parent('div').attr('data-officeid');
             var reportingunitid = $el.parent('h2').parent('div').attr('data-reportingunitid');
+            var accept_ap = !$(this).hasClass('accept_ap_calls');
 
-            if ($(this).hasClass('accept_ap_calls')) {
-                set_ap(false, raceid, statepostal, officeid, reportingunitid, $el);
-            } else {
-                set_ap(true, raceid, statepostal, officeid, reportingunitid, $el);
-            }
+            // for the confirmation message
+            var description = $el.parent().text().trim();
+            var raceType = $el.closest('.row').prev().text().split(':')[0];
+            var verb = accept_ap ? 'take' : 'ignore';
+            var qualifier = raceType === 'President' ? 'the Presidential race' : 'the ' + raceType + ' race';
+            var confirmation = 'Are you sure you want to ' + verb + ' AP calls for ' + qualifier + ' in ' + description + '?';
+
+            if (!confirm(confirmation)) { return window.location.reload(); };
+            set_ap(accept_ap, raceid, statepostal, officeid, reportingunitid, $el);
         }
 
         $('select.race-call').change(race_call_click);
         $('h2 small').on('click', ap_call_click);
 
+        // @TODO: Remove this from global scope later.
+        window.callRaceTest_removeMe = call_race;
     });
 </script>
 {% endblock %}
