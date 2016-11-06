@@ -385,9 +385,9 @@ table td strong {
             */
             $el = $(this)
             var candidate_unique_id = $el.children("option:selected" ).val();
-            var raceid = $el.parent('p').parent('div').attr('data-raceid');
-            var statepostal = $el.parent('p').parent('div').attr('data-statepostal');
-            var reportingunitid = $el.parent('p').parent('div').attr('data-reportingunitid');
+            var raceid = $el.parent('div').attr('data-raceid');
+            var statepostal = $el.parent('div').attr('data-statepostal');
+            var reportingunitid = $el.parent('div').attr('data-reportingunitid');
             var confirmation = "";
             if (candidate_unique_id == ''){
                 candidate_unique_id = null;
