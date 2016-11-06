@@ -103,14 +103,9 @@ ALL_STATES = [x for x in SENATE_SWING + SENATE_OTHER]
 
 @app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
 def scripts(racedate, script_type):
-    base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
+    base_command = '. /home/ubuntu/.virtualenvs/loaderpypy/bin/activate && cd /home/ubuntu/elex-loader/ && '
     if request.method == 'GET':
-        o = "1"
-
-        if script_type == 'bake':
-            pass
-        else:
-            o = os.system('%s./scripts/prd/%s.sh %s' % (base_command, script_type, racedate))
+        o = os.system('%s./scripts/prd/%s.sh %s' % (base_command, script_type, racedate))
 
         return json.dumps({"message": "success", "output": o})
 
