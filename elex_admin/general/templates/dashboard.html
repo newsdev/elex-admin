@@ -33,6 +33,12 @@ table td strong {
     font-size: 14px;
     font-weight: 700;
 }
+.dem {
+    color: #1a80c4;
+}
+.rep {
+    color: #cc3d3d;
+}
 </style>
 
 <div id="alert-holder"></div>
@@ -88,7 +94,7 @@ table td strong {
     <table>
         <tr>
             <td> <strong>AP call</strong></td>
-            <td> {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}
+            <td> {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="dem">Clinton (D)</span>{% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="rep">Trump (R)</span>{% endif %}{% endfor %}
             </td>
         </tr>
         <tr>
@@ -135,7 +141,10 @@ table td strong {
                     {% if c.race_unique_id == state.race_unique_id %}
                         {% for r in ap_winners %}
                             {% if r.candidate_unique_id == c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %}
+                            {% if c.party == "Dem" %}<span class="dem">
+                            {% elif c.party == "GOP" %}<span class="rep">{% endif %}
                                 {{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})
+                            </span>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -181,7 +190,7 @@ table td strong {
      <table>
         <tr>
             <td> <strong>AP call</strong></td>
-            <td> {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}
+            <td> {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="dem">Clinton (D)</span>{% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="rep">Trump (R)</span>{% endif %}{% endfor %}
             </td>
         </tr>
         <tr>
@@ -228,7 +237,10 @@ table td strong {
                 {% if c.race_unique_id == state.race_unique_id %}
                     {% for r in ap_winners %}
                         {% if r.candidate_unique_id == c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %}
-                            {{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})
+                            {% if c.party == "Dem" %}<span class="dem">
+                            {% elif c.party == "GOP" %}<span class="rep">{% endif %}
+                                {{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})
+                            {% else %}
                         {% endif %}
                     {% endfor %}
                 {% endif %}
