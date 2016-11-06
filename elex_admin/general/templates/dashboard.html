@@ -2,11 +2,15 @@
 
 {% block content %}
 <style type="text/css">
-h1 {
-    margin-top: 25px;
+.page-title  {
+    font-size: 32px;
+    margin-top: 0;
 }
 h1 {
-    font-size: 28px;
+    margin-top: 60px;
+}
+h1 {
+    font-size: 26px;
 }
 h2 small:after {
     content: "NYT";
@@ -21,8 +25,9 @@ h2 small {
 }
 h2 {
     font-size: 21px;
-    border-bottom:1px solid #CCC; 
-    padding-bottom: 8px;
+    /*border-bottom:1px solid #CCC; */
+    /*padding-bottom: 8px;*/
+    margin-bottom: 8px;
 } 
 table td {
     padding: 3px 6px 3px 0;
@@ -39,13 +44,27 @@ table td strong {
 .rep {
     color: #cc3d3d;
 }
+@media (min-width: 992px) {
+    .col-md-3 { 
+        margin: 25px 0 0;
+        border-top: 1px solid #ccc;
+        padding-top: 25px;
+    }
+    .col-md-3:nth-child(1),
+    .col-md-3:nth-child(2),
+    .col-md-3:nth-child(3),
+    .col-md-3:nth-child(4) { 
+        border-top: none;
+        margin-top: 0;
+    }
+}
 </style>
 
 <div id="alert-holder"></div>
 
 <div class="row" style="margin-bottom:20px;">
     <div class="col-md-12">
-        <h1>2016 General Election</h1>
+        <h1 class="page-title">2016 General Election</h1>
     </div>
 </div>
 
@@ -55,6 +74,7 @@ table td strong {
 
         <button class="btn btn-large btn-default script" data-script="update"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;&nbsp;Update</button>
 
+        <a href="archive/" style="margin-left: 10px;">To archive &rarr;</a>
     </div>
     <div class="col-md-2">
         <div class="input-group">
@@ -67,14 +87,12 @@ table td strong {
         </div><!-- /input-group -->
     </div>
 </div>
-
+<!-- 
 <div class="row" style="margin-bottom:10px;">
-    <div class="col-md-12">
-        <a href="archive/">To archive &rarr;</a>
-    </div>
-</div>
+    
+</div> -->
 
-<h1>President: Swing States</h1>
+<h1>President: Key Races</h1>
 
 <div class="row">
 {% for state in prez_swing %}
@@ -83,8 +101,7 @@ table td strong {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
-    data-reportingunitid="{{ state.reportingunitid }}"
-    style="margin:20px 0;">
+    data-reportingunitid="{{ state.reportingunitid }}">
 
     <h2>
         {{ state.state_label }}
@@ -93,12 +110,12 @@ table td strong {
 
     <table>
         <tr>
-            <td> <strong>AP call</strong></td>
+            <td> <strong>AP</strong></td>
             <td> {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="dem">Clinton (D)</span>{% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="rep">Trump (R)</span>{% endif %}{% endfor %}
             </td>
         </tr>
         <tr>
-            <td><strong>NYT call</strong></td>
+            <td><strong>NYT</strong></td>
             <td>
                 <select class="race-call">
                     <option value="">-- No winner --</option>
@@ -116,7 +133,7 @@ table td strong {
 {% endfor %}
 </div>
 
-<h1>Senate: Swing States</h1>
+<h1>Senate: Key Races</h1>
 
 <div class="row">
 {% for state in senate_swing %}
@@ -125,8 +142,7 @@ table td strong {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
-    data-reportingunitid="{{ state.reportingunitid }}"
-    style="margin:20px 0;">
+    data-reportingunitid="{{ state.reportingunitid }}">
 
     <h2>
         {{ state.state_label }}
@@ -135,7 +151,7 @@ table td strong {
 
     <table>
         <tr>
-            <td> <strong>AP call</strong></td>
+            <td> <strong>AP</strong></td>
             <td> 
                 {% for c in senate_swing_cands %}
                     {% if c.race_unique_id == state.race_unique_id %}
@@ -152,7 +168,7 @@ table td strong {
             </td>
         </tr>
         <tr>
-            <td><strong>NYT call</strong></td>
+            <td><strong>NYT</strong></td>
             <td>
                 <select class="race-call">
                     <option value="">-- No winner --</option>
@@ -179,8 +195,7 @@ table td strong {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
-    data-reportingunitid="{{ state.reportingunitid }}"
-    style="margin:20px 0;">
+    data-reportingunitid="{{ state.reportingunitid }}">
 
     <h2>
         {{ state.state_label }}
@@ -189,12 +204,12 @@ table td strong {
 
      <table>
         <tr>
-            <td> <strong>AP call</strong></td>
+            <td> <strong>AP</strong></td>
             <td> {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="dem">Clinton (D)</span>{% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}<span class="rep">Trump (R)</span>{% endif %}{% endfor %}
             </td>
         </tr>
         <tr>
-            <td><strong>NYT call</strong></td>
+            <td><strong>NYT</strong></td>
             <td>
                 <select class="race-call">
                     <option value="">-- No winner --</option>
@@ -221,8 +236,7 @@ table td strong {
     data-officeid="{{ state.officeid }}"
     data-statepostal="{{ state.statepostal }}"
     data-raceid="{{ state.raceid }}"
-    data-reportingunitid="{{ state.reportingunitid }}"
-    style="margin:20px 0;">
+    data-reportingunitid="{{ state.reportingunitid }}">
 
     <h2>
         {{ state.state_label }}
@@ -231,7 +245,7 @@ table td strong {
 
     <table>
         <tr>
-            <td> <strong>AP call</strong></td>
+            <td> <strong>AP</strong></td>
             <td>
             {% for c in senate_other_cands %}
                 {% if c.race_unique_id == state.race_unique_id %}
@@ -248,7 +262,7 @@ table td strong {
             </td>
         </tr>
         <tr>
-            <td><strong>NYT call</strong></td>
+            <td><strong>NYT</strong></td>
             <td>
                 <select class="race-call">
                     <option value="">-- No winner --</option>
@@ -334,7 +348,7 @@ table td strong {
 
         var set_ap = function(accept_ap_calls, raceid, statepostal, officeid, reportingunitid, $el) {
             /*
-            Passes logic for setting AP calls on / off for a particular race.
+            Passes logic for setting APs on / off for a particular race.
             Note: There is no "null" setting.
             */
             var data = {
