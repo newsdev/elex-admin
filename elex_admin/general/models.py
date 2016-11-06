@@ -5,7 +5,7 @@ from peewee import *
 from playhouse.postgres_ext import *
 
 import general.utils as utils
-from maps import PREZ_REPORTING_UNIT_TO_DISTRICT_LABELS
+from maps import PREZ_REPORTING_UNIT_TO_DISTRICT_LABELS, PREZ_STATE_TO_LABEL
 
 database_proxy = Proxy()
 
@@ -47,7 +47,9 @@ class OverrideRace(BaseModel):
     def state_label(self):
         if "district" in self.reportingunitid:
             return PREZ_REPORTING_UNIT_TO_DISTRICT_LABELS[self.reportingunitid]['label']
-        return self.statepostal
+        # use full state names
+        return PREZ_STATE_TO_LABEL[self.statepostal]
+        # return self.statepostal
 
 class ElexRace(BaseModel):
     raceid = CharField(null=True)
@@ -61,6 +63,11 @@ class ElexRace(BaseModel):
 
     class Meta:
         db_table = 'elex_races'
+
+    @property
+    def state_label(self):
+        # use full state names
+        return PREZ_STATE_TO_LABEL[self.statepostal]
 
 
 class ElexResult(BaseModel):

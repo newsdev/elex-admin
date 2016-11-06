@@ -60,30 +60,85 @@ ELECTORAL_VOTES_BY_STATEPOSTAL = {
 PREZ_REPORTING_UNIT_TO_DISTRICT_LABELS = {
     "district-20005": {
         "reportingunitname": "At Large",
-        "label": "ME-0"
+        "label": "Maine At Large"
     },
     "district-20026": {
         "reportingunitname": "District 1",
-        "label": "ME-1"
+        "label": "Maine Dist. 1"
     },
     "district-20027": {
         "reportingunitname": "District 2",
-        "label": "ME-2"
+        "label": "Maine Dist. 2"
     },
     "district-28004": {
         "reportingunitname": "At Large",
-        "label": "NE-0"
+        "label": "Nebraska At Large"
     },
     "district-28006": {
         "reportingunitname": "District 1",
-        "label": "NE-1"
+        "label": "Nebraska Dist. 1"
     },
     "district-28007": {
         "reportingunitname": "District 2",
-        "label": "NE-2"
+        "label": "Nebraska Dist. 2"
     },
     "district-28008": {
         "reportingunitname": "District 3",
-        "label": "NE-3"
+        "label": "Nebraska Dist. 3"
     }
+}
+
+PREZ_STATE_TO_LABEL = {
+    "AK": "Alaska",
+    "AL": "Alabama",
+    "AR": "Arkansas",
+    "AZ": "Arizona",
+    "CA": "California",
+    "CO": "Colorado",
+    "CT": "Connecticut",
+    "DC": "District of Columbia",
+    "DE": "Delaware",
+    "FL": "Florida",
+    "GA": "Georgia",
+    "HI": "Hawaii",
+    "IA": "Iowa",
+    "ID": "Idaho",
+    "IL": "Illinois",
+    "IN": "Indiana",
+    "KS": "Kansas",
+    "KY": "Kentucky",
+    "LA": "Louisiana",
+    "MA": "Massachusetts",
+    "MD": "Maryland",
+    "ME": "Maine",
+    "MI": "Michigan",
+    "MN": "Minnesota",
+    "MO": "Missouri",
+    "MS": "Mississippi",
+    "MT": "Montana",
+    "NC": "North Carolina",
+    "ND": "North Dakota",
+    "NE": "Nebraska",
+    "NH": "New Hampshire",
+    "NJ": "New Jersey",
+    "NM": "New Mexico",
+    "NV": "Nevada",
+    "NY": "New York",
+    "OH": "Ohio",
+    "OK": "Oklahoma",
+    "OR": "Oregon",
+    "PA": "Pennsylvania",
+    "RI": "Rhode Island",
+    "SC": "South Carolina",
+    "SD": "South Dakota",
+    "TN": "Tennessee",
+    "TX": "Texas",
+    "US": "National",
+    "UT": "Utah",
+    "VA": "Virginia",
+    "VT": "Vermont",
+    "WA": "Washington",
+    "WI": "Wisconsin",
+    "WV": "West Virginia",
+    "WY": "Wyoming"
 }
