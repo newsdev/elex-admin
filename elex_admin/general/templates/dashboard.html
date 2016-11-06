@@ -428,6 +428,8 @@ table td strong {
         $('select.race-call').change(race_call_click);
         $('h2 small').on('click', ap_call_click);
 
+        // @TODO: Remove this from global scope later.
+        window.callRaceTest_removeMe = call_race;
     });
 </script>
 {% endblock %}
