@@ -88,6 +88,7 @@ PREZ_OTHER = [
     'state-ID-1',
     'state-WV-1',
     'state-WY-1',
+    'state-NE-1',
     'district-28004',
     'district-28006',
     'district-28007',
