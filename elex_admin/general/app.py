@@ -43,10 +43,7 @@ PREZ_SWING = [
     'state-NV-1',
     'state-NH-1',
     'state-AZ-1',
-    'state-GA-1',
-    'state-ME-1',
-    'district-20027',
-    'district-28007'
+    'state-GA-1'
 ]
 
 PREZ_OTHER = [
@@ -67,8 +64,10 @@ PREZ_OTHER = [
     'state-NM-1',
     'state-MI-1',
     'state-MN-1',
+    'state-ME-1',
     'district-20005',
     'district-20026',
+    'district-20027',
     'state-MO-1',
     'state-IN-1',
     'state-SC-1',
@@ -91,10 +90,11 @@ PREZ_OTHER = [
     'state-WY-1',
     'district-28004',
     'district-28006',
+    'district-28007',
     'district-28008'
 ]
 
-SENATE_SWING = ['WI','IN','NV','NH','PA','NC','MO'] 
+SENATE_SWING = ['WI','IN','NV','NH','PA','NC','MO']
 SENATE_OTHER = ['FL','AZ','LA','KY','IA','AR','OH','GA','AL','SD','OK','ND','UT','KS','SC','ID','AK', 'CA','VT','NY','MD','HI','CT','OR','WA','CO','IL']
 
 ALL_STATES = [x for x in SENATE_SWING + SENATE_OTHER]
@@ -323,6 +323,7 @@ def race_list(racedate):
                                     )\
                                     .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
 
+
         context['prez_other'] = models.OverrideRace\
                                     .select()\
                                     .where(
@@ -330,6 +331,8 @@ def race_list(racedate):
                                         models.OverrideRace.reportingunitid << PREZ_OTHER
                                     )\
                                     .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
+
+        print context['prez_other']
 
         context['senate_swing'] = models.ElexRace\
                                     .select()\
@@ -356,7 +359,7 @@ def race_list(racedate):
                                         models.ElexRace.officeid == "S",
                                         models.ElexRace.statepostal << SENATE_OTHER,
                                     )\
-                                    .order_by(+models.ElexRace.statepostal)
+                                    .order_by(+models.ElexRace.statepostal, +models.ElexRace.reportingunitid)
 
         context['senate_other_cands'] = models.ElexResult\
                                     .select()\
