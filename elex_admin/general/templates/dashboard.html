@@ -28,7 +28,7 @@ h2 {
     /*border-bottom:1px solid #CCC; */
     /*padding-bottom: 8px;*/
     margin-bottom: 8px;
-} 
+}
 table td {
     padding: 3px 6px 3px 0;
 }
@@ -45,7 +45,7 @@ table td strong {
     color: #cc3d3d;
 }
 @media (min-width: 992px) {
-    .col-md-3 { 
+    .col-md-3 {
         margin: 20px 0 0;
         border-top: 1px solid #ccc;
         padding-top: 20px;
@@ -53,7 +53,7 @@ table td strong {
     .col-md-3:nth-child(1),
     .col-md-3:nth-child(2),
     .col-md-3:nth-child(3),
-    .col-md-3:nth-child(4) { 
+    .col-md-3:nth-child(4) {
         border-top: none;
         margin-top: 0;
     }
@@ -87,9 +87,9 @@ table td strong {
         </div><!-- /input-group -->
     </div>
 </div>
-<!-- 
+<!--
 <div class="row" style="margin-bottom:10px;">
-    
+
 </div> -->
 
 <h1>President: Key Races</h1>
@@ -152,7 +152,7 @@ table td strong {
     <table>
         <tr>
             <td> <strong>AP</strong></td>
-            <td> 
+            <td>
                 {% for c in senate_swing_cands %}
                     {% if c.race_unique_id == state.race_unique_id %}
                         {% for r in ap_winners %}
@@ -319,14 +319,16 @@ table td strong {
                     // look up racetype + winner
                     var called = !!data.candidate_unique_id;
                     var raceType = $el.closest('.row').prev().text().split(':')[0];
+                    var description = $el.closest('table').prev('h2').text().trim();
                     var qualifier = raceType === 'President' ? '' : 'the ' + raceType + ' race in ';
                     var message = null;
                     if (called) {
-                      var winner = $el.children('option:selected').text();
+                      var $selected = $el.children('option:selected');
+                      var winner = $selected.data('full-name') + ' ' + $selected.text().slice(-3); // party is last three characters
                       // generate the message
-                      message = 'NYT has called ' + qualifier + data.statepostal + ' for ' + winner;
+                      message = 'NYT called ' + qualifier + description + ' for ' + winner;
                     } else {
-                      message = '*UNCALLED RACE* :siren: NYT has _UNCALLED_ ' + qualifier + data.statepostal;
+                      message = '*UNCALLED RACE* :siren: NYT _UNCALLED_ ' + qualifier + description;
                     }
 
                     var env = window.location.host.split('-')[2];
@@ -336,7 +338,7 @@ table td strong {
                       json: true,
                       url: '{{ SLACK_WEBHOOK_URL }}',
                       data: JSON.stringify({
-                        text: ':siren: <!here> ' + message,
+                        text: ':siren: ' + message + ' <!here>',
                         channel: env === 'prd' ? '#race-calls' : '#race-calls-test',
                         username: 'NYT Race Calls'
                       })
@@ -388,13 +390,15 @@ table td strong {
             var raceid = $el.parent('div').attr('data-raceid');
             var statepostal = $el.parent('div').attr('data-statepostal');
             var reportingunitid = $el.parent('div').attr('data-reportingunitid');
+            var description = $el.closest('table').prev('h2').text().trim();
             var confirmation = "";
             if (candidate_unique_id == ''){
                 candidate_unique_id = null;
-                confirmation = "Are you sure you uncall " + statepostal + "?";
+                confirmation = "Are you sure you uncall " + description + "?";
             } else {
-                var name = $el.children("option:selected" ).text();
-                confirmation = "Are you sure you want to call " + statepostal + " for "  + name + "?";
+                var party = $el.children("option:selected" ).text().slice(-3);
+                var name = $el.children('option:selected').data('full-name') + ' ' + party;
+                confirmation = "Are you sure you want to call " + description + " for "  + name + "?";
             }
             if (!confirm(confirmation)) { return window.location.reload(); } ;
             call_race(candidate_unique_id, statepostal + '-' + raceid, reportingunitid, $el);
