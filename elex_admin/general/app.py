@@ -44,11 +44,12 @@ PREZ_SWING = [
     'state-NH-1',
     'state-AZ-1',
     'state-GA-1',
+    'state-ME-1',
     'district-20027',
     'district-28007'
 ]
 
-PREZ_DEM = [
+PREZ_OTHER = [
     'state-DC-1',
     'state-HI-1',
     'state-MD-1',
@@ -67,10 +68,7 @@ PREZ_DEM = [
     'state-MI-1',
     'state-MN-1',
     'district-20005',
-    'district-20026'
-]
-
-PREZ_GOP = [
+    'district-20026',
     'state-MO-1',
     'state-IN-1',
     'state-SC-1',
@@ -97,10 +95,9 @@ PREZ_GOP = [
 ]
 
 SENATE_SWING = ['WI','IN','NV','NH','PA','NC','MO'] 
-SENATE_GOP = ['FL','AZ','LA','KY','IA','AR','OH','GA','AL','SD','OK','ND','UT','KS','SC','ID','AK']
-SENATE_DEM = ['CA','VT','NY','MD','HI','CT','OR','WA','CO','IL']
+SENATE_OTHER = ['FL','AZ','LA','KY','IA','AR','OH','GA','AL','SD','OK','ND','UT','KS','SC','ID','AK', 'CA','VT','NY','MD','HI','CT','OR','WA','CO','IL']
 
-ALL_STATES = [x for x in SENATE_SWING + SENATE_GOP + SENATE_DEM]
+ALL_STATES = [x for x in SENATE_SWING + SENATE_OTHER]
 
 
 @app.route('/elections/2016/admin/<racedate>/archive/')
@@ -325,19 +322,11 @@ def race_list(racedate):
                                     )\
                                     .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
 
-        context['prez_lean_gop'] = models.OverrideRace\
+        context['prez_other'] = models.OverrideRace\
                                     .select()\
                                     .where(
                                         models.OverrideRace.raceid == "0",
-                                        models.OverrideRace.reportingunitid << PREZ_GOP
-                                    )\
-                                    .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
-
-        context['prez_lean_dem'] = models.OverrideRace\
-                                    .select()\
-                                    .where(
-                                        models.OverrideRace.raceid == "0",
-                                        models.OverrideRace.reportingunitid << PREZ_DEM
+                                        models.OverrideRace.reportingunitid << PREZ_OTHER
                                     )\
                                     .order_by(+models.OverrideRace.statepostal, +models.OverrideRace.reportingunitid)
 
@@ -359,41 +348,21 @@ def race_list(racedate):
                                     )\
                                     .order_by(+models.ElexResult.statepostal, +models.ElexResult.last)
 
-        context['senate_lean_gop'] = models.ElexRace\
+        context['senate_other'] = models.ElexRace\
                                     .select()\
                                     .where(
                                         models.ElexRace.national == True,
                                         models.ElexRace.officeid == "S",
-                                        models.ElexRace.statepostal << SENATE_GOP,
+                                        models.ElexRace.statepostal << SENATE_OTHER,
                                     )\
                                     .order_by(+models.ElexRace.statepostal)
 
-        context['senate_lean_gop_cands'] = models.ElexResult\
+        context['senate_other_cands'] = models.ElexResult\
                                     .select()\
                                     .where(
                                         models.ElexResult.national == True,
                                         models.ElexResult.officeid == "S",
-                                        models.ElexResult.statepostal << SENATE_GOP,
-                                        models.ElexResult.party << ["Dem", "GOP"],
-                                        models.ElexResult.level == 'state'
-                                    )\
-                                    .order_by(+models.ElexResult.statepostal)
-
-        context['senate_lean_dem'] = models.ElexRace\
-                                    .select()\
-                                    .where(
-                                        models.ElexRace.national == True,
-                                        models.ElexRace.officeid == "S",
-                                        models.ElexRace.statepostal << SENATE_DEM
-                                    )\
-                                    .order_by(+models.ElexRace.statepostal)
-
-        context['senate_lean_dem_cands'] = models.ElexResult\
-                                    .select()\
-                                    .where(
-                                        models.ElexResult.national == True,
-                                        models.ElexResult.officeid == "S",
-                                        models.ElexResult.statepostal << SENATE_DEM,
+                                        models.ElexResult.statepostal << SENATE_OTHER,
                                         models.ElexResult.party << ["Dem", "GOP"],
                                         models.ElexResult.level == 'state'
                                     )\

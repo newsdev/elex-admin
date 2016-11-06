@@ -132,10 +132,10 @@ h2 small {
 {% endfor %}
 </div>
 
-<h1>President: Lean Dem</h1>
+<h1>President: Other Races</h1>
 
 <div class="row">
-{% for state in prez_lean_dem %}
+{% for state in prez_other %}
 <div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
@@ -167,45 +167,10 @@ h2 small {
 {% endfor %}
 </div>
 
-<h1>President: Lean GOP</h1>
+<h1>Senate: Other Races</h1>
 
 <div class="row">
-{% for state in prez_lean_gop %}
-<div
-    class="col-md-3"
-    data-officeid="{{ state.officeid }}"
-    data-statepostal="{{ state.statepostal }}"
-    data-raceid="{{ state.raceid }}"
-    data-reportingunitid="{{ state.reportingunitid }}"
-    style="margin:20px 0;">
-
-    <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
-        {{ state.state_label }}
-        <small{% if state.accept_ap_calls %} class="accept_ap_calls"{% endif %}></small>
-    </h2>
-
-    <p><strong>AP call</strong>: {% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-1746' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Clinton (D){% endif %}{% endfor %}{% for r in ap_winners %}{% if r.candidate_unique_id == 'polid-8639' and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %}Trump (R){% endif %}{% endfor %}</p>
-
-    <p>
-        <strong>NYT call</strong>:
-        <select class="race-call">
-            <option value="">-- Pick a winner --</option>
-            {% for c in prez_cands %}
-            {% if c.reportingunitid == state.reportingunitid %}
-            <option data-full-name="{{ c.first }} {{ c.last }}" value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
-            {% endif %}
-            {% endfor %}
-        </select>
-    </p>
-
-</div>
-{% endfor %}
-</div>
-
-<h1>Senate: Lean Dem</h1>
-
-<div class="row">
-{% for state in senate_lean_dem %}
+{% for state in senate_other %}
 <div
     class="col-md-3"
     data-officeid="{{ state.officeid }}"
@@ -216,6 +181,7 @@ h2 small {
 
     <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
         {{ state.statepostal }}
+        !! {{ state.statename }}
         <small{% if state.accept_ap_calls %} class="accept_ap_calls"{% endif %}></small>
     </h2>
 
@@ -237,52 +203,6 @@ h2 small {
         <select class="race-call">
             <option value="">-- Pick a winner --</option>
             {% for c in senate_lean_dem_cands %}
-            {% if c.reportingunitid == state.reportingunitid %}
-            <option data-full-name="{{ c.first }} {{ c.last }}" value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
-            {% endif %}
-            {% endfor %}
-        </select>
-    </p>
-
-</div>
-{% endfor %}
-</div>
-
-<h1>Senate: Lean GOP</h1>
-
-<div class="row">
-{% for state in senate_lean_gop %}
-<div
-    class="col-md-3"
-    data-officeid="{{ state.officeid }}"
-    data-statepostal="{{ state.statepostal }}"
-    data-raceid="{{ state.raceid }}"
-    data-reportingunitid="{{ state.reportingunitid }}"
-    style="margin:20px 0;">
-
-    <h2 style="border-bottom:1px solid #aaa; padding-bottom:8px;">
-        {{ state.statepostal }}
-        <small{% if state.accept_ap_calls %} class="accept_ap_calls"{% endif %}></small>
-    </h2>
-
-    <p>
-        <strong>AP call</strong>:
-        {% for c in senate_lean_gop_cands %}
-            {% if c.race_unique_id == state.race_unique_id %}
-                {% for r in ap_winners %}
-                    {% if r.candidate_unique_id == c.candidate_unique_id and r.statepostal == state.statepostal and r.raceid == state.raceid %}
-                        {{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-    </p>
-
-    <p>
-        <strong>NYT call</strong>:
-        <select class="race-call">
-            <option value="">-- Pick a winner --</option>
-            {% for c in senate_lean_gop_cands %}
             {% if c.reportingunitid == state.reportingunitid %}
             <option data-full-name="{{ c.first }} {{ c.last }}" value="{{ c.candidate_unique_id }}"{% for r in nyt_winners %}{% if r.candidate_unique_id ==  c.candidate_unique_id and r.reportingunitid == state.reportingunitid and r.raceid == state.raceid %} selected{% endif %}{% endfor %}>{{ c.last }} ({% if c.party == "Dem" %}D{% elif c.party == "GOP" %}R{% endif %})</option>
             {% endif %}
