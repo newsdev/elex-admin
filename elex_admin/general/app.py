@@ -101,6 +101,20 @@ SENATE_OTHER = ['FL','AZ','LA','KY','IA','AR','OH','GA','AL','SD','OK','ND','UT'
 ALL_STATES = [x for x in SENATE_SWING + SENATE_OTHER]
 
 
+@app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
+def scripts(racedate, script_type):
+    base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
+    if request.method == 'GET':
+        o = "1"
+
+        if script_type == 'bake':
+            pass
+        else:
+            o = os.system('%s./scripts/prd/%s.sh %s' % (base_command, script_type, racedate))
+
+        return json.dumps({"message": "success", "output": o})
+
+
 @app.route('/elections/2016/admin/<racedate>/archive/')
 def archive_list(racedate):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
