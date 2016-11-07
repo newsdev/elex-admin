@@ -14,7 +14,7 @@ ENVIRONMENTS = {
     }, 
     "stg-west": {
         "hosts": 'int-elex-stg-west.newsdev.net',
-    }
+    },
     "stg": {
         "hosts": 'int-elex-stg-east.newsdev.net',
     }
