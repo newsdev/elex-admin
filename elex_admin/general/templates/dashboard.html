@@ -312,7 +312,7 @@ table td strong {
             $.ajax({
                 type: "GET",
                 url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
-                success: function(response){ 
+                success: function(response){
                     pop_alert(script_type, response.output);
                     console.log(script_type);
                     console.log(response);
@@ -482,9 +482,6 @@ table td strong {
         $('h2 small').on('click', ap_call_click);
         $('button.script').on('click', run_server_script);
         $('#set-timeout').on('click', set_loader_timeout);
-
-        // @TODO: Remove this from global scope later.
-        window.callRaceTest_removeMe = call_race;
     });
 </script>
 {% endblock %}
