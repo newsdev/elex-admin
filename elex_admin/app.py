@@ -50,8 +50,8 @@ def archive_list(racedate):
         race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
         state_dict = {}
         state_dict['statepostal'] = state
-        state_dict['report'] = race.report
-        state_dict['report_description'] = race.report_description
+        state_dict['report'] = None
+        state_dict['report_description'] = None
         context['states'].append(state_dict)
 
     return render_template('archive_list.html', **context)
@@ -78,7 +78,7 @@ def race_list(racedate):
         context['presidential_races'] = models.ElexRace\
                                     .select()\
                                     .where(
-                                        models.ElexRace.national == True, 
+                                        models.ElexRace.national == True,
                                         models.ElexRace.officeid == "P"
                                     )\
                                     .order_by(+models.ElexRace.statepostal)
@@ -93,8 +93,8 @@ def race_list(racedate):
         context['other_races'] = models.ElexRace\
                                     .select()\
                                     .where(
-                                        ~(models.ElexRace.id << context['national_races']), 
-                                        ~(models.ElexRace.id << context['presidential_races']), 
+                                        ~(models.ElexRace.id << context['national_races']),
+                                        ~(models.ElexRace.id << context['presidential_races']),
                                     )\
                                     .order_by(+models.ElexRace.statepostal)
 
@@ -104,8 +104,8 @@ def race_list(racedate):
             race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
             state_dict = {}
             state_dict['statepostal'] = state
-            state_dict['report'] = race.report
-            state_dict['report_description'] = race.report_description
+            state_dict['report'] = None
+            state_dict['report_description'] = None
             context['states'].append(state_dict)
 
         return render_template('race_list.html', **context)
@@ -219,7 +219,7 @@ def race_detail(racedate,raceid):
             context['ap_winner'] = None
             ap_winner = models.ElexResult.select().where(
                                             models.ElexResult.raceid == raceid.split('-')[1],
-                                            models.ElexResult.statepostal == raceid.split('-')[0], 
+                                            models.ElexResult.statepostal == raceid.split('-')[0],
                                             models.ElexResult.winner == True
             )
             if len(ap_winner) > 0:
@@ -233,8 +233,8 @@ def race_detail(racedate,raceid):
                 race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
                 state_dict = {}
                 state_dict['statepostal'] = state
-                state_dict['report'] = race.report
-                state_dict['report_description'] = race.report_description
+                state_dict['report'] = None
+                state_dict['report_description'] = None
                 context['states'].append(state_dict)
 
             return render_template('race_detail.html', **context)
