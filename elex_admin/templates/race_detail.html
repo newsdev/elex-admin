@@ -142,7 +142,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '/elections/2016/admin/{{ RACEDATE }}/race/' + race_id + '/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/race/' + race_id + '/',
                 data: data,
                 success: function(response){ update_race_inputs(data,race_id); },
                 dataType: 'JSON'
@@ -163,7 +163,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '/elections/2016/admin/{{ RACEDATE }}/candidate/' + candidate_id + '/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/candidate/' + candidate_id + '/',
                 data: data,
                 success: function(response){ console.log(response); },
                 dataType: 'JSON'
@@ -182,7 +182,7 @@
             data['candidates'] = candidates.join();
             $.ajax({
                 type: "POST",
-                url: '/elections/2016/admin/{{ RACEDATE }}/candidateorder/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/candidateorder/',
                 data: data,
                 dataType: 'JSON',
                 success: function(response){ console.log(response); }

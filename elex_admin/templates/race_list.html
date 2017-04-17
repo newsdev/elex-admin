@@ -77,7 +77,7 @@
 
         {% for race in presidential_races %}
         <tr>
-            <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.statepostal }}-{{ race.id }}/">{{ race.statepostal }}</a></td>
+            <td><a href="/elections/2017/admin/{{ RACEDATE }}/race/{{ race.statepostal }}-{{ race.id }}/">{{ race.statepostal }}</a></td>
             <td>{{ race.party }}</td>
             <td>{{ race.officename }}</td>
             <td>{{ race.racetype }}</td>
@@ -107,7 +107,7 @@
 
         {% for race in national_races %}
         <tr>
-            <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.statepostal }}-{{ race.id }}/">{{ race.statepostal }}</a></td>
+            <td><a href="/elections/2017/admin/{{ RACEDATE }}/race/{{ race.statepostal }}-{{ race.id }}/">{{ race.statepostal }}</a></td>
             <td>{{ race.party }}</td>
             <td>{{ race.officename }}</td>
             <td>{{ race.seatname }}</td>
@@ -123,7 +123,7 @@
     </div>
     <div class="col-md-12" style="margin-bottom:30px;">
         <button class="btn btn-large btn-default script" data-script="accept_local_calls"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>&nbsp;&nbsp;Accept AP Calls</button>
-        
+
         <button class="btn btn-large btn-default script" data-script="ignore_local_calls"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>&nbsp;&nbsp;Ignore AP Calls</button>
     </div>
     <div class="col-md-12">
@@ -137,7 +137,7 @@
 
         {% for race in other_races %}
         <tr>
-            <td><a href="/elections/2016/admin/{{ RACEDATE }}/race/{{ race.statepostal }}-{{ race.id }}/">{{ race.statepostal }}</a></td>
+            <td><a href="/elections/2017/admin/{{ RACEDATE }}/race/{{ race.statepostal }}-{{ race.id }}/">{{ race.statepostal }}</a></td>
             <td>{{ race.party }}</td>
             <td>{{ race.officename }}</td>
             <td>{{ race.seatname }}</td>
@@ -173,8 +173,8 @@
             var script_type = $(this).attr('data-script');
             $.ajax({
                 type: "GET",
-                url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
-                success: function(response){ 
+                url: '/elections/2017/admin/{{ RACEDATE }}/script/' + script_type + '/',
+                success: function(response){
                     pop_alert(script_type, response.output);
                 },
                 dataType: 'JSON'
@@ -187,7 +187,7 @@
             $.ajax({
                 type: 'POST',
                 data: data,
-                url: '/elections/2016/admin/{{ RACEDATE }}/loader/timeout/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/loader/timeout/',
                 success: function(response){
                     pop_alert("Set timeout", response.output);
                 },
@@ -208,7 +208,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '/elections/2016/admin/{{ RACEDATE }}/state/' + statepostal + '/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/state/' + statepostal + '/',
                 data: data,
                 success: function(response){  },
                 dataType: 'JSON'
