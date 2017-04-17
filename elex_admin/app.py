@@ -22,7 +22,7 @@ import utils
 app = Flask(__name__)
 app.debug=True
 
-@app.route('/elections/2016/admin/<racedate>/archive/')
+@app.route('/elections/*/admin/<racedate>/archive/')
 def archive_list(racedate):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
@@ -56,12 +56,12 @@ def archive_list(racedate):
 
     return render_template('archive_list.html', **context)
 
-@app.route('/elections/2016/admin/<racedate>/archive/<filename>')
+@app.route('/elections/*/admin/<racedate>/archive/<filename>')
 def archive_detail(racedate, filename):
     with open('/tmp/%s/%s' % (racedate, filename), 'r') as readfile:
         return readfile.read()
 
-@app.route('/elections/2016/admin/<racedate>/')
+@app.route('/elections/*/admin/<racedate>/')
 def race_list(racedate):
     context = utils.build_context(racedate)
     context['presidential_races'] = []
@@ -118,7 +118,7 @@ def race_list(racedate):
         context['error'] = e
         return render_template('error.html', **context)
 
-@app.route('/elections/2016/admin/<racedate>/script/<script_type>/', methods=['GET'])
+@app.route('/elections/*/admin/<racedate>/script/<script_type>/', methods=['GET'])
 def scripts(racedate, script_type):
     base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
     if request.method == 'GET':
@@ -131,7 +131,7 @@ def scripts(racedate, script_type):
 
         return json.dumps({"message": "success", "output": o})
 
-@app.route('/elections/2016/admin/<racedate>/csv/', methods=['POST'])
+@app.route('/elections/*/admin/<racedate>/csv/', methods=['POST'])
 def overrides_post(racedate):
     if request.method == 'POST':
         payload = dict(request.form)
@@ -154,7 +154,7 @@ def overrides_post(racedate):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/2016/admin/<racedate>/csv/<override>/', methods=['GET'])
+@app.route('/elections/*/admin/<racedate>/csv/<override>/', methods=['GET'])
 def overrides_csv(racedate, override):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
@@ -180,7 +180,7 @@ def overrides_csv(racedate, override):
         output.headers["Content-type"] = "text/csv"
         return output
 
-@app.route('/elections/2016/admin/<racedate>/state/<statepostal>/', methods=['POST'])
+@app.route('/elections/*/admin/<racedate>/state/<statepostal>/', methods=['POST'])
 def state_detail(racedate, statepostal):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
@@ -203,7 +203,7 @@ def state_detail(racedate, statepostal):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/2016/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
+@app.route('/elections/*/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
 def race_detail(racedate,raceid):
     if request.method == 'GET':
         try:
@@ -264,7 +264,7 @@ def race_detail(racedate,raceid):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/2016/admin/<racedate>/candidateorder/', methods=['POST'])
+@app.route('/elections/*/admin/<racedate>/candidateorder/', methods=['POST'])
 def candidate_order(racedate):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
@@ -284,7 +284,7 @@ def candidate_order(racedate):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/2016/admin/<racedate>/candidate/<candidateid>/', methods=['POST'])
+@app.route('/elections/*/admin/<racedate>/candidate/<candidateid>/', methods=['POST'])
 def candidate_detail(racedate, candidateid):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
@@ -304,7 +304,7 @@ def candidate_detail(racedate, candidateid):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/2016/admin/<racedate>/loader/timeout/', methods=['POST'])
+@app.route('/elections/*/admin/<racedate>/loader/timeout/', methods=['POST'])
 def set_loader_timeout(racedate):
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
