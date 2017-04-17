@@ -76,7 +76,9 @@ def pip_install():
 def bounce(racedate=None):
     if racedate:
         env.racedate = racedate
-    api.run('sudo service %(project_name)s-%(racedate)s restart' % env)
+    with api.settings(warn_only=True):
+        api.run('sudo service %(racedate)s stop' % env)
+        api.run('sudo service %(racedate)s start' % env)
 
 @api.task
 def candidates(racedate):
