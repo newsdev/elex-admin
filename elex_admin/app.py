@@ -33,7 +33,7 @@ def archive_list(racedate, raceyear):
         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
     )
     models.database_proxy.initialize(racedate_db)
-    context = utils.build_context(racedate)
+    context = utils.build_context(racedate, raceyear)
     context['files'] = sorted(
         [
             {
@@ -67,7 +67,7 @@ def archive_detail(racedate, filename, raceyear):
 
 @app.route('/elections/<raceyear>/admin/<racedate>/')
 def race_list(racedate, raceyear):
-    context = utils.build_context(racedate)
+    context = utils.build_context(racedate, raceyear)
     context['races'] = []
     context['states'] = []
 
@@ -77,16 +77,14 @@ def race_list(racedate, raceyear):
                 host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
         )
         models.database_proxy.initialize(racedate_db)
-        context['races'] = models.ElexRace.select().order_by(+models.ElexRace.statepostal)
-
+        context['races'] = [r for r in models.ElexResult.raw("""select officename, seatname, race_unique_id, raceid, statepostal, accept_ap_calls from elex_results group by officename, seatname, race_unique_id, raceid, statepostal, accept_ap_calls""")]
         state_list = sorted(list(set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
 
         for state in state_list:
-            race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
+            race = models.OverrideRace.select().where(models.OverrideRace.statepostal == state)[0]
             state_dict = {}
             state_dict['statepostal'] = state
-            state_dict['report'] = None
-            state_dict['report_description'] = None
+            state_dict['report'] = race.report
             context['states'].append(state_dict)
 
         return render_template('race_list.html', **context)
@@ -113,7 +111,7 @@ def scripts(racedate, script_type, raceyear):
         return json.dumps({"message": "success", "output": o})
 
 @app.route('/elections/<raceyear>/admin/<racedate>/csv/', methods=['POST'])
-def overrides_post(racedate):
+def overrides_post(racedate, raceyear):
     if request.method == 'POST':
         payload = dict(request.form)
         candidates_text = None
@@ -170,14 +168,10 @@ def state_detail(racedate, statepostal, raceyear):
     models.database_proxy.initialize(racedate_db)
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
-        races = ["%s-%s" % (r.statepostal, r.raceid) for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
+        races = [r.race_unique_id for r in models.ElexRace.select().where(models.ElexRace.statepostal == statepostal)]
         for r in races:
-            o = models.OverrideRace.get(
-                    models.OverrideRace.race_raceid == r.split('-')[1],
-                    models.OverrideRace.race_statepostal == r.split('-')[0]
-            )
+            o = models.OverrideRace.get(models.OverrideRace.race_unique_id==r)
             o.report=payload['report']
-            o.report_description=payload['report_description']
             o.save()
 
         utils.update_views(models.database_proxy)
@@ -185,7 +179,7 @@ def state_detail(racedate, statepostal, raceyear):
         return json.dumps({"message": "success"})
 
 @app.route('/elections/<raceyear>/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
-def race_detail(racedate,raceid):
+def race_detail(racedate, raceid, raceyear):
     if request.method == 'GET':
         try:
             racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
@@ -193,16 +187,15 @@ def race_detail(racedate,raceid):
                     host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
             )
             models.database_proxy.initialize(racedate_db)
-            context = utils.build_context(racedate)
-            context['race'] = models.ElexRace.get(models.ElexRace.raceid == raceid.split('-')[1], models.ElexRace.statepostal == raceid.split('-')[0])
-            context['candidates'] = sorted(models.ElexCandidate.select().where(models.ElexCandidate.nyt_races.contains(raceid)), key=lambda x:x.nyt_display_order)
+            context = utils.build_context(racedate, raceyear)
+
+            context['race'] = [r for r in models.ElexResult.raw("""select officename, seatname, race_unique_id, raceid, statepostal, accept_ap_calls from elex_results where race_unique_id = '%s' group by officename, seatname, race_unique_id, raceid, statepostal, accept_ap_calls""" % raceid)][0]
+
+            context['candidates'] = models.ElexResult.raw("""select nyt_winner, candidate_unique_id, first, last from elex_results where race_unique_id = '%s' group by nyt_winner, candidate_unique_id, first, last order by last, first DESC;""" % raceid)
 
             context['ap_winner'] = None
-            ap_winner = models.ElexResult.select().where(
-                                            models.ElexResult.raceid == raceid.split('-')[1],
-                                            models.ElexResult.statepostal == raceid.split('-')[0],
-                                            models.ElexResult.winner == True
-            )
+            ap_winner = [m for m in models.ElexResult.raw("""select candidate_unique_id, first, last, winner, nyt_winner, nyt_called from elex_results where race_unique_id = '%s' and winner = 'true' group by candidate_unique_id, first, last, winner, nyt_winner, nyt_called order by last, first DESC;""" % raceid)]
+
             if len(ap_winner) > 0:
                 context['ap_winner'] = ap_winner[0]
 
@@ -232,32 +225,16 @@ def race_detail(racedate,raceid):
         models.database_proxy.initialize(racedate_db)
         payload = utils.clean_payload(dict(request.form))
         try:
-            r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid.split('-')[1], models.OverrideRace.race_statepostal == raceid.split('-')[0])
+            r = models.OverrideRace.get(models.OverrideRace.race_unique_id==raceid)
         except models.OverrideRace.DoesNotExist:
-            r = models.OverrideRace.create(race_raceid=raceid.split('-')[1], race_statepostal=raceid.split('-')[0])
+            r = models.OverrideRace.create(
+                race_unique_id=raceid,
+                raceid=raceid.split('-')[1],
+                statepostal=raceid.split('-')[0])
 
         utils.set_winner(payload['nyt_winner'], raceid)
 
         utils.update_model(r, payload)
-        utils.update_views(models.database_proxy)
-
-        return json.dumps({"message": "success"})
-
-@app.route('/elections/<raceyear>/admin/<racedate>/candidateorder/', methods=['POST'])
-def candidate_order(racedate):
-    racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
-        user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
-        host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
-    )
-    models.database_proxy.initialize(racedate_db)
-    if request.method == 'POST':
-        payload = utils.clean_payload(dict(request.form))
-
-        if payload.get('candidates', None):
-            for idx, candidateid in enumerate(payload['candidates'].split(',')):
-                oc = models.OverrideCandidate.update(nyt_display_order=idx).where(models.OverrideCandidate.candidate_candidateid == candidateid)
-                oc.execute()
-
         utils.update_views(models.database_proxy)
 
         return json.dumps({"message": "success"})
@@ -273,9 +250,9 @@ def candidate_detail(racedate, candidateid, raceyear):
         payload = utils.clean_payload(dict(request.form))
 
         try:
-            oc = models.OverrideCandidate.get(models.OverrideCandidate.candidate_candidateid == candidateid)
+            oc = models.OverrideCandidate.get(models.OverrideCandidate.candidate_unique_id == candidateid)
         except models.OverrideCandidate.DoesNotExist:
-            oc = models.OverrideCandidate.create(candidate_candidateid=candidateid)
+            oc = models.OverrideCandidate.create(candidate_unique_id=candidateid)
 
         utils.update_model(oc, payload)
         utils.update_views(models.database_proxy)

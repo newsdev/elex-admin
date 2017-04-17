@@ -14,18 +14,9 @@
 
 <div class="row">
     <div class="col-md-12">
-        <h1 style="margin-bottom:40px;">{{ RACEDATE }} {{ race }}</h1>
+        <h1 style="margin-bottom:40px;">{{ RACEDATE }} {{ race.statepostal }}, {{ race.officename }} {{ race.seatname }}</h1>
     </div>
 </div>
-
-
-{% if race.nyt_race_description %}
-<div class="row" style="margin:15px 0;">
-    <div class="col-md-12">
-        <p id="target-nyt_race_description" style="font-size: 24px;">{{ race.nyt_race_description }}</p>
-    </div>
-</div>
-{% endif %}
 
 {% if ap_winner %}
 <div class="row" style="margin:15px 0;">
@@ -39,67 +30,20 @@
     <div class="col-md-12">
         <table class="table races" id="race-{{race.statepostal}}-{{ race.raceid }}">
             <tr>
-                <td><strong>Accept AP calls</strong></td><td><input class="race-ap-toggle" data-raceid="{{race.statepostal}}-{{ race.raceid }}" type="checkbox" {% if race.accept_ap_calls %}checked {% endif%}data-toggle="toggle" data-onstyle="success"></td>
+                <td><strong>Accept AP calls</strong></td><td><input class="race-ap-toggle" data-raceid="{{ race.race_unique_id }}" type="checkbox" {% if race.accept_ap_calls %}checked {% endif%}data-toggle="toggle" data-onstyle="success"></td>
             </tr>
-            <tr>
-                <td><strong>Race name</strong></td><td><input class="form-control nyt_race_name" name="nyt_race_name" data-raceid="{{race.statepostal}}-{{ race.raceid }}" value="{% if race.nyt_race_name %}{{ race.nyt_race_name }}{% else %}{{ race }}{% endif %}"></td>
-            </tr>
-            <tr>
-                <td><strong>Race description</strong></td><td><textarea class="form-control nyt_race_description" name="nyt_race_description" data-raceid="{{race.statepostal}}-{{ race.raceid }}" >{% if race.nyt_race_description %}{{ race.nyt_race_description }}{% else %}{% endif %}</textarea></td>
-            </tr>
-
-            <tr>
-                <td><strong>Race preview</strong></td><td><textarea class="form-control nyt_race_preview" name="nyt_race_preview" data-raceid="{{race.statepostal}}-{{ race.raceid }}" >{% if race.nyt_race_preview %}{{ race.nyt_race_preview }}{% else %}{% endif %}</textarea></td>
-            </tr>
-
-            <tr>
-                <td><strong>Delegate allocation</strong></td><td><textarea class="form-control nyt_delegate_allocation" name="nyt_delegate_allocation" data-raceid="{{race.statepostal}}-{{ race.raceid }}">{% if race.nyt_delegate_allocation %}{{ race.nyt_delegate_allocation }}{% else %}{% endif %}</textarea></td>
-            </tr>
-
-            <tr>
-                <td><strong>Race result description</strong></td><td><textarea class="form-control nyt_race_result_description" name="nyt_race_result_description" data-raceid="{{race.statepostal}}-{{ race.raceid }}" >{% if race.nyt_race_result_description %}{{ race.nyt_race_result_description }}{% else %}{% endif %}</textarea></td>
-            </tr>
-
             <tr>
                 <td><strong>Winner</strong></td>
                 <td>
-                    <select{% if race.accept_ap_calls %} disabled{% endif %} class="form-control nyt_winner" name="nyt_winner" data-raceid="{{race.statepostal}}-{{ race.raceid }}">
+                    <select{% if race.accept_ap_calls %} disabled{% endif %} class="form-control nyt_winner" name="nyt_winner" data-raceid="{{ race.race_unique_id }}">
                         <option value=""></option>
                         {% for c in candidates %}
-                         <option{% if c.nyt_winner %} selected{% endif %} value="{{ c.candidateid }}">{{ c }}</option>
+                         <option{% if c.nyt_winner %} selected{% endif %} value="{{ c.candidate_unique_id }}">{{ c.last }}, {{ c.first }}</option>
                         {% endfor %}
                     </select>
                 </td>
             </tr>
         </table>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        {% if candidates %}
-        <h3>Candidates</h3>
-        <table class="table" style="padding-bottom:0px;margin-bottom:0px;">
-            <tr>
-                <th width="32%">Name</th>
-                <th width="42%">Description</th>
-                <th width="12%">Display?</th>
-                <th width="10%">Delegates</th>
-                <th width="4%"></th>
-            </tr>
-        </table>
-        <table class="table candidates" id="candidate-table">
-            {% for c in candidates %}
-            <tr id="candidate-{{ c.candidateid }}">
-                <td width="32%"><input data-candidateid="{{ c.candidateid }}" class="form-control candidate-name" name="nyt_candidate_name" value="{{ c }}"></td>
-                <td width="42%"><textarea data-candidateid="{{ c.candidateid }}" class="form-control candidate-description" name="nyt_candidate_description">{% if c.nyt_candidate_description %}{{ c.nyt_candidate_description }}{% endif %}</textarea></td>
-                <td width="12%"><input data-candidateid="{{ c.candidateid }}" type="checkbox" class="form-control candidate-important" name="nyt_candidate_important" {% if c.nyt_candidate_important %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
-                <td width="10%"><input data-candidateid="{{ c.candidateid }}" class="form-control nyt-delegates" name="nyt_candidate_name" value="{% if c.nyt_delegates %}{{ c.nyt_delegates }}{% else %}{% endif %}"></td>
-                <td class="sort-handler" width="4%"></td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% endif %}
     </div>
 </div>
 
@@ -153,7 +97,7 @@
             /*
                 Submit the current state of a candidate in the form.
             */
-            var candidate_id = $(this).attr('data-candidateid');
+            var candidate_id = $(this).attr('data-candidate-unique-id');
             var data = {};
 
             data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
@@ -190,8 +134,13 @@
         }
 
         var confirm_race_call = function() {
+          var candidates = {
+            {% for c in candidates %}"{{ c.candidate_unique_id}}": "{{ c.last }}, {{ c.first }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+          }
+
             var candidate_id = $(this).val();
-            var nyt_candidate_name = $('#candidate-' + candidate_id + ' input.candidate-name').val();
+            var nyt_candidate_name = candidates[candidate_id];
             var confirmation = null;
 
             if (!nyt_candidate_name && candidate_id === '') {

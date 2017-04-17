@@ -64,9 +64,6 @@ class ElexRace(BaseModel):
     class Meta:
         db_table = 'elex_races'
 
-    def nyt_officename(self):
-        return maps.OFFICENAME_BY_OFFICEID[self.officeid]
-
     @property
     def state_label(self):
         # use full state names
