@@ -12,12 +12,7 @@
 <div class="row" style="margin-bottom:30px;">
     <div class="col-md-10">
         <button class="btn btn-large btn-default script" data-script="reload"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>&nbsp;&nbsp;Reload</button>
-
-        <button class="btn btn-large btn-default script" data-script="delegates"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;&nbsp;Delegates</button>
-
         <button class="btn btn-large btn-default script" data-script="update"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;&nbsp;Update</button>
-
-        <button class="btn btn-large btn-default disabled" data-script="bake"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Bake</button>
     </div>
     <div class="col-md-2">
         <div class="input-group">
@@ -73,8 +68,8 @@
             var script_type = $(this).attr('data-script');
             $.ajax({
                 type: "GET",
-                url: '/elections/2016/admin/{{ RACEDATE }}/script/' + script_type + '/',
-                success: function(response){ 
+                url: '/elections/2017/admin/{{ RACEDATE }}/script/' + script_type + '/',
+                success: function(response){
                     pop_alert(script_type, response.output);
                 },
                 dataType: 'JSON'
@@ -87,7 +82,7 @@
             $.ajax({
                 type: 'POST',
                 data: data,
-                url: '/elections/2016/admin/{{ RACEDATE }}/loader/timeout/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/loader/timeout/',
                 success: function(response){
                     pop_alert("Set timeout", response.output);
                 },
@@ -108,7 +103,7 @@
 
             $.ajax({
                 type: "POST",
-                url: '/elections/2016/admin/{{ RACEDATE }}/state/' + statepostal + '/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/state/' + statepostal + '/',
                 data: data,
                 success: function(response){  },
                 dataType: 'JSON'
