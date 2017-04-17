@@ -11,7 +11,7 @@ ENVIRONMENTS = {
     },
     "prd": {
         "hosts": 'int-elex-prd-east.newsdev.net',
-    }, 
+    },
     "stg-west": {
         "hosts": 'int-elex-stg-west.newsdev.net',
     },
@@ -70,7 +70,7 @@ def pull():
 
 @api.task
 def pip_install():
-    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && pip install -r requirements.txt' % env)
+    api.run('cd /home/ubuntu/%(project_name)s; workon %(project_name)s && pip install -r py2.requirements.txt' % env)
 
 @api.task
 def bounce(racedate=None):
