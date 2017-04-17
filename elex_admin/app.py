@@ -22,8 +22,8 @@ import utils
 app = Flask(__name__)
 app.debug=True
 
-@app.route('/elections/*/admin/<racedate>/archive/')
-def archive_list(racedate):
+@app.route('/elections/<raceyear>/admin/<racedate>/archive/')
+def archive_list(racedate, raceyear):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
@@ -56,13 +56,13 @@ def archive_list(racedate):
 
     return render_template('archive_list.html', **context)
 
-@app.route('/elections/*/admin/<racedate>/archive/<filename>')
-def archive_detail(racedate, filename):
+@app.route('/elections/<raceyear>/admin/<racedate>/archive/<filename>')
+def archive_detail(racedate, filename, raceyear):
     with open('/tmp/%s/%s' % (racedate, filename), 'r') as readfile:
         return readfile.read()
 
-@app.route('/elections/*/admin/<racedate>/')
-def race_list(racedate):
+@app.route('/elections/<raceyear>/admin/<racedate>/')
+def race_list(racedate, raceyear):
     context = utils.build_context(racedate)
     context['presidential_races'] = []
     context['national_races'] = []
@@ -118,8 +118,8 @@ def race_list(racedate):
         context['error'] = e
         return render_template('error.html', **context)
 
-@app.route('/elections/*/admin/<racedate>/script/<script_type>/', methods=['GET'])
-def scripts(racedate, script_type):
+@app.route('/elections/<raceyear>/admin/<racedate>/script/<script_type>/', methods=['GET'])
+def scripts(racedate, script_type, raceyear):
     base_command = '. /home/ubuntu/.virtualenvs/elex-loader/bin/activate && cd /home/ubuntu/elex-loader/ && '
     if request.method == 'GET':
         o = "1"
@@ -131,7 +131,7 @@ def scripts(racedate, script_type):
 
         return json.dumps({"message": "success", "output": o})
 
-@app.route('/elections/*/admin/<racedate>/csv/', methods=['POST'])
+@app.route('/elections/<raceyear>/admin/<racedate>/csv/', methods=['POST'])
 def overrides_post(racedate):
     if request.method == 'POST':
         payload = dict(request.form)
@@ -154,8 +154,8 @@ def overrides_post(racedate):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/*/admin/<racedate>/csv/<override>/', methods=['GET'])
-def overrides_csv(racedate, override):
+@app.route('/elections/<raceyear>/admin/<racedate>/csv/<override>/', methods=['GET'])
+def overrides_csv(racedate, override, raceyear):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
@@ -180,8 +180,8 @@ def overrides_csv(racedate, override):
         output.headers["Content-type"] = "text/csv"
         return output
 
-@app.route('/elections/*/admin/<racedate>/state/<statepostal>/', methods=['POST'])
-def state_detail(racedate, statepostal):
+@app.route('/elections/<raceyear>/admin/<racedate>/state/<statepostal>/', methods=['POST'])
+def state_detail(racedate, statepostal, raceyear):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
@@ -203,7 +203,7 @@ def state_detail(racedate, statepostal):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/*/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
+@app.route('/elections/<raceyear>/admin/<racedate>/race/<raceid>/', methods=['GET', 'POST'])
 def race_detail(racedate,raceid):
     if request.method == 'GET':
         try:
@@ -264,7 +264,7 @@ def race_detail(racedate,raceid):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/*/admin/<racedate>/candidateorder/', methods=['POST'])
+@app.route('/elections/<raceyear>/admin/<racedate>/candidateorder/', methods=['POST'])
 def candidate_order(racedate):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
@@ -284,8 +284,8 @@ def candidate_order(racedate):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/*/admin/<racedate>/candidate/<candidateid>/', methods=['POST'])
-def candidate_detail(racedate, candidateid):
+@app.route('/elections/<raceyear>/admin/<racedate>/candidate/<candidateid>/', methods=['POST'])
+def candidate_detail(racedate, candidateid, raceyear):
     racedate_db = PostgresqlExtDatabase('elex_%s' % racedate,
         user=os.environ.get('ELEX_ADMIN_USER', 'elex'),
         host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
@@ -304,8 +304,8 @@ def candidate_detail(racedate, candidateid):
 
         return json.dumps({"message": "success"})
 
-@app.route('/elections/*/admin/<racedate>/loader/timeout/', methods=['POST'])
-def set_loader_timeout(racedate):
+@app.route('/elections/<raceyear>/admin/<racedate>/loader/timeout/', methods=['POST'])
+def set_loader_timeout(racedate, raceyear):
     if request.method == 'POST':
         payload = utils.clean_payload(dict(request.form))
 
