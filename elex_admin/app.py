@@ -7,7 +7,11 @@ import json
 import io
 import os
 import re
-from sets import Set
+try:
+    set
+except NameError:
+    from sets import Set as set
+
 import datetime
 
 from csvkit import py2
@@ -44,7 +48,7 @@ def archive_list(racedate, raceyear):
 
     context['states'] = []
 
-    state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+    state_list = sorted(list(set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
 
     for state in state_list:
         race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
@@ -64,9 +68,7 @@ def archive_detail(racedate, filename, raceyear):
 @app.route('/elections/<raceyear>/admin/<racedate>/')
 def race_list(racedate, raceyear):
     context = utils.build_context(racedate)
-    context['presidential_races'] = []
-    context['national_races'] = []
-    context['other_races'] = []
+    context['races'] = []
     context['states'] = []
 
     try:
@@ -75,30 +77,9 @@ def race_list(racedate, raceyear):
                 host=os.environ.get('ELEX_ADMIN_HOST', '127.0.0.1')
         )
         models.database_proxy.initialize(racedate_db)
-        context['presidential_races'] = models.ElexRace\
-                                    .select()\
-                                    .where(
-                                        models.ElexRace.national == True,
-                                        models.ElexRace.officeid == "P"
-                                    )\
-                                    .order_by(+models.ElexRace.statepostal)
+        context['races'] = models.ElexRace.select().order_by(+models.ElexRace.statepostal)
 
-        context['national_races'] = models.ElexRace\
-                                    .select()\
-                                    .where(
-                                        models.ElexRace.national == True,
-                                        models.ElexRace.officeid << ["G","S","H"]
-                                    )\
-                                    .order_by(+models.ElexRace.statepostal)
-        context['other_races'] = models.ElexRace\
-                                    .select()\
-                                    .where(
-                                        ~(models.ElexRace.id << context['national_races']),
-                                        ~(models.ElexRace.id << context['presidential_races']),
-                                    )\
-                                    .order_by(+models.ElexRace.statepostal)
-
-        state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+        state_list = sorted(list(set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
 
         for state in state_list:
             race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
@@ -110,11 +91,11 @@ def race_list(racedate, raceyear):
 
         return render_template('race_list.html', **context)
 
-    except peewee.OperationalError, e:
+    except peewee.OperationalError as e:
         context['error'] = e
         return render_template('error.html', **context)
 
-    except peewee.ProgrammingError, e:
+    except peewee.ProgrammingError as e:
         context['error'] = e
         return render_template('error.html', **context)
 
@@ -227,7 +208,7 @@ def race_detail(racedate,raceid):
 
             context['states'] = []
 
-            state_list = sorted(list(Set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
+            state_list = sorted(list(set([race.statepostal for race in models.ElexRace.select()])), key=lambda x: x)
 
             for state in state_list:
                 race = models.ElexRace.select().where(models.ElexRace.statepostal == state)[0]
@@ -239,7 +220,7 @@ def race_detail(racedate,raceid):
 
             return render_template('race_detail.html', **context)
 
-        except peewee.OperationalError, e:
+        except peewee.OperationalError as e:
             context['error'] = e
             return render_template('error.html', **context)
 
@@ -254,8 +235,6 @@ def race_detail(racedate,raceid):
             r = models.OverrideRace.get(models.OverrideRace.race_raceid == raceid.split('-')[1], models.OverrideRace.race_statepostal == raceid.split('-')[0])
         except models.OverrideRace.DoesNotExist:
             r = models.OverrideRace.create(race_raceid=raceid.split('-')[1], race_statepostal=raceid.split('-')[0])
-
-        print payload
 
         utils.set_winner(payload['nyt_winner'], raceid)
 
@@ -275,7 +254,6 @@ def candidate_order(racedate):
         payload = utils.clean_payload(dict(request.form))
 
         if payload.get('candidates', None):
-            print payload['candidates']
             for idx, candidateid in enumerate(payload['candidates'].split(',')):
                 oc = models.OverrideCandidate.update(nyt_display_order=idx).where(models.OverrideCandidate.candidate_candidateid == candidateid)
                 oc.execute()

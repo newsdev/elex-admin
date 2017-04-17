@@ -1,3 +1,23 @@
+OFFICENAME_BY_OFFICEID = {
+    "G": "Governor",
+    "H": "U.S. House",
+    "I": "Amendment, Ballot Measure, Initiative, Proposal, Proposition, Referendum or Question",
+    "P": "President",
+    "S": "U.S. Senate",
+    "Y": "State House, State Assembly, General Assembly or House of Delegates",
+    "Z": "State Senate",
+    "A": "Attorney General",
+    "C": "Controller or Comptroller",
+    "D": "District Attorney",
+    "E": "Education Commissioner or Superintendent of Public Instruction",
+    "J": "Insurance Commissioner",
+    "L": "Lieutenant Governor",
+    "M": "Mayor",
+    "N": "City Council",
+    "R": "Secretary of State",
+    "T": "Treasurer"
+}
+
 ELECTORAL_VOTES_BY_STATEPOSTAL = {
     "AK": 3,
     "AL": 9,
