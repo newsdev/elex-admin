@@ -4,7 +4,7 @@ import os
 from peewee import *
 from playhouse.postgres_ext import *
 
-import general.utils as utils
+import utils
 from maps import PREZ_REPORTING_UNIT_TO_DISTRICT_LABELS, PREZ_STATE_TO_LABEL
 
 database_proxy = Proxy()
