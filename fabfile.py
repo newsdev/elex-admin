@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import time
 
 from fabric import api, operations, contrib
 from fabric.state import env
@@ -78,6 +79,7 @@ def bounce(racedate=None):
         env.racedate = racedate
     with api.settings(warn_only=True):
         api.run('sudo service %(racedate)s stop' % env)
+        time.sleep(1)
         api.run('sudo service %(racedate)s start' % env)
 
 @api.task
