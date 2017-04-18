@@ -30,7 +30,7 @@
     <div class="col-md-12">
         <table class="table races" id="race-{{race.statepostal}}-{{ race.raceid }}">
             <tr>
-                <td><strong>Accept AP calls</strong></td><td><input class="race-ap-toggle" data-raceid="{{ race.race_unique_id }}" type="checkbox" {% if race.accept_ap_calls %}checked {% endif%}data-toggle="toggle" data-onstyle="success"></td>
+                <td><strong>Accept AP calls</strong></td><td><input class="race-ap-toggle" data-raceid="{{ race.race_unique_id }}" type="checkbox" {% if race.accept_ap_calls %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
             </tr>
             <tr>
                 <td><strong>Winner</strong></td>
@@ -47,6 +47,28 @@
     </div>
 </div>
 
+<div class="row" id="candidates" {% if race.accept_ap_calls %}style="display:none;"{% endif %}>
+    <div class="col-md-12">
+        <table class="table candidates" id="race-{{race.statepostal}}-{{ race.raceid }}">
+            <tr>
+                <th>Name</th>
+                <th>Party</th>
+                <th>Runoff?</th>
+            </tr>
+            {% for c in candidates %}
+            <tr>
+                <td>{{ c.last }}, {{ c.first }}</td>
+                <td>{{ c.party }}</td>
+                <td><input class="candidate-runoff-toggle" data-candidate-name="{{ c.last }}, {{ c.first }}" data-candidate-unique-id="{{ c.candidate_unique_id }}" type="checkbox" {% if c.nyt_runoff %}checked {% endif %}data-toggle="toggle" data-onstyle="success"></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-12">
+      <button data-raceid="{{ race.race_unique_id }}" id="submit-runoff" class="btn btn-success btn-xl">Submit runoff</button>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extrajs %}
@@ -59,8 +81,10 @@
             var winner = data['accept_ap_calls'] = $('#race-' + race_id + ' input.race-ap-toggle').prop('checked');
             if (winner) {
                 $('#race-' + race_id + ' select.nyt_winner').prop('disabled', true);
+                $('#candidates').hide();
             } else {
                 $('#race-' + race_id + ' select.nyt_winner').prop('disabled', false);
+                $('#candidates').show();
             }
         };
 
@@ -88,56 +112,62 @@
                 type: "POST",
                 url: '/elections/2017/admin/{{ RACEDATE }}/race/' + race_id + '/',
                 data: data,
-                success: function(response){ update_race_inputs(data,race_id); },
+                success: function(response){ update_race_inputs(data, race_id); },
                 dataType: 'JSON'
             });
         };
 
-        var submit_candidate = function(data){
-            /*
-                Submit the current state of a candidate in the form.
-            */
-            var candidate_id = $(this).attr('data-candidate-unique-id');
+        var submit_runoff = function(data){
+            var race_id = $(this).attr('data-raceid');
             var data = {};
+            data['nyt_runoff'] = []
+            data['nyt_winner'] = '';
 
-            data['nyt_candidate_name'] = $('#candidate-' + candidate_id + ' input.candidate-name').val();
-            data['nyt_candidate_description'] = $('#candidate-' + candidate_id + ' textarea.candidate-description').val();
-            data['nyt_candidate_important'] = $('#candidate-' + candidate_id + ' input.candidate-important').prop('checked');
-            data['nyt_delegates'] = $('#candidate-' + candidate_id + ' input.nyt-delegates').val();
+            $('input.candidate-runoff-toggle:checked').each(function(i,c){
+              data['nyt_runoff'].push($(c).attr('data-candidate-unique-id'));
+            });
+
+            data['nyt_runoff'] = data['nyt_runoff'].join();
 
             $.ajax({
                 type: "POST",
-                url: '/elections/2017/admin/{{ RACEDATE }}/candidate/' + candidate_id + '/',
+                url: '/elections/2017/admin/{{ RACEDATE }}/race/' + race_id + '/',
                 data: data,
-                success: function(response){ console.log(response); },
+                success: function(response){ update_race_inputs(data, race_id); },
                 dataType: 'JSON'
             });
         };
 
-        var set_candidate_indexes = function(data) {
-            var $table = $('#candidate-table');
-            var data = {}
-            candidates = [];
-            $table.find('tr').each(function(idx, el){
-                if ($(el).attr('id')){
-                    candidates.push($(el).attr('id').split('candidate-')[1])
-                }
-            });
-            data['candidates'] = candidates.join();
-            $.ajax({
-                type: "POST",
-                url: '/elections/2017/admin/{{ RACEDATE }}/candidateorder/',
-                data: data,
-                dataType: 'JSON',
-                success: function(response){ console.log(response); }
-            });
+        var confirm_runoff_call = function() {
+          var nyt_runoff = []
+          var confirmation = null;
+
+          $('input.candidate-runoff-toggle:checked').each(function(i,c){
+            nyt_runoff.push($(c).attr('data-candidate-name'));
+          });
+
+          if (nyt_runoff.length == 0) {
+            // set no winner
+            confirmation = confirm("Are you sure that you want to set no candidates involved in the runoff?");
+          } else {
+            // set the runoff candidates
+            confirmation = confirm("Are you sure that you want to set the following candidates to be involved in the runoff?\n\n" + nyt_runoff.join("\n") );
+          }
+          if (confirmation === true){
+            // execute submit_runoff function with original context
+            submit_runoff.bind(this)();
+          } else {
+            // reload the page to reset the state
+            location.reload();
+          }
+
         }
 
         var confirm_race_call = function() {
-          var candidates = {
-            {% for c in candidates %}"{{ c.candidate_unique_id}}": "{{ c.last }}, {{ c.first }}"{% if not loop.last %},{% endif %}
-            {% endfor %}
-          }
+            var candidates = {
+              {% for c in candidates %}"{{ c.candidate_unique_id}}": "{{ c.last }}, {{ c.first }}"{% if not loop.last %},{% endif %}
+              {% endfor %}
+            };
 
             var candidate_id = $(this).val();
             var nyt_candidate_name = candidates[candidate_id];
@@ -160,20 +190,10 @@
         }
 
         $('table.races .form-control').on('blur', submit_race);
-        $('table.candidates .form-control').on('blur', submit_candidate);
-        $('input.candidate-important').on('change', submit_candidate)
         $('select.nyt_winner').on('change', confirm_race_call);
         $('input.race-ap-toggle').on('change', submit_race);
-
-        $('#candidate-table').rowSorter({
-            handler: 'td.sort-handler',
-            stickFirstRow : true,
-            stickLastRow  : false,
-            onDrop: function(tbody, row, new_index, old_index)
-            {
-                set_candidate_indexes();
-            }
-        });
+        // $('input.candidate-runoff-toggle').on('change', submit_runoff);
+        $('#submit-runoff').on('click', confirm_runoff_call);
 
     });
 </script>

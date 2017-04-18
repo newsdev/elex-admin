@@ -191,7 +191,7 @@ def race_detail(racedate, raceid, raceyear):
 
             context['race'] = [r for r in models.ElexResult.raw("""select officename, seatname, race_unique_id, raceid, statepostal, accept_ap_calls from elex_results where race_unique_id = '%s' group by officename, seatname, race_unique_id, raceid, statepostal, accept_ap_calls""" % raceid)][0]
 
-            context['candidates'] = models.ElexResult.raw("""select nyt_winner, candidate_unique_id, first, last from elex_results where race_unique_id = '%s' group by nyt_winner, candidate_unique_id, first, last order by last, first DESC;""" % raceid)
+            context['candidates'] = models.ElexResult.raw("""select nyt_runoff, party, nyt_winner, candidate_unique_id, first, last from elex_results where race_unique_id = '%s' group by nyt_runoff, party, nyt_winner, candidate_unique_id, first, last order by last, first DESC;""" % raceid)
 
             context['ap_winner'] = None
             ap_winner = [m for m in models.ElexResult.raw("""select candidate_unique_id, first, last, winner, nyt_winner, nyt_called from elex_results where race_unique_id = '%s' and winner = 'true' group by candidate_unique_id, first, last, winner, nyt_winner, nyt_called order by last, first DESC;""" % raceid)]
@@ -232,7 +232,16 @@ def race_detail(racedate, raceid, raceyear):
                 raceid=raceid.split('-')[1],
                 statepostal=raceid.split('-')[0])
 
+        # nyt_winner is a single ID, there can only be one winner.
         utils.set_winner(payload['nyt_winner'], raceid)
+
+        print(payload)
+
+        # nyt_runoff is a list of ids, there can be 2 or more advancing.
+        runoff_cands = []
+        if payload.get('nyt_runoff', None):
+            runoff_cands = [x.strip() for x in payload['nyt_runoff'].split(',')]
+        utils.set_runoff(runoff_cands, raceid)
 
         utils.update_model(r, payload)
         utils.update_views(models.database_proxy)

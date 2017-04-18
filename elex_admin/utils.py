@@ -14,10 +14,10 @@ CREATE OR REPLACE VIEW elex_races AS
 
 ELEX_RESULTS_VIEW_COMMAND = """
 CREATE OR REPLACE VIEW elex_results as
-(SELECT DISTINCT orace.race_unique_id, orace.report, orace.nyt_race_name, orace.nyt_race_description, orace.accept_ap_calls, orace.nyt_called, ocand.nyt_winner,ocand.nyt_name, ocand.nyt_electwon, result.* FROM results as result
+(SELECT DISTINCT orace.race_unique_id, orace.report, orace.nyt_race_name, orace.nyt_race_description, orace.accept_ap_calls, orace.nyt_called, ocand.nyt_winner, ocand.nyt_runoff, ocand.nyt_name, ocand.nyt_electwon, result.* FROM results as result
         LEFT JOIN override_candidates as ocand on result.candidate_unique_id = ocand.candidate_unique_id and result.statepostal = ocand.statepostal and result.raceid = ocand.raceid
         LEFT JOIN override_races as orace on orace.statepostal = result.statepostal and orace.raceid = result.raceid
-        WHERE result.raceid != '0') UNION (SELECT DISTINCT orace.race_unique_id, orace.report, orace.nyt_race_name, orace.nyt_race_description, orace.accept_ap_calls, orace.nyt_called, ocand.nyt_winner,ocand.nyt_name, ocand.nyt_electwon, result.* FROM results as result
+        WHERE result.raceid != '0') UNION (SELECT DISTINCT orace.race_unique_id, orace.report, orace.nyt_race_name, orace.nyt_race_description, orace.accept_ap_calls, orace.nyt_called, ocand.nyt_winner, ocand.nyt_runoff, ocand.nyt_name, ocand.nyt_electwon, result.* FROM results as result
         LEFT JOIN override_candidates as ocand on result.candidate_unique_id = ocand.candidate_unique_id and result.statepostal = ocand.statepostal and result.raceid = ocand.raceid AND ocand.reportingunitid = result.reportingunitid
         LEFT JOIN override_races as orace on orace.statepostal = result.statepostal and orace.raceid = result.raceid and orace.reportingunitid = result.reportingunitid
         WHERE result.raceid = '0');
@@ -32,6 +32,45 @@ def update_model(cls, payload):
         if k != 'nyt_winner':
             setattr(cls,k,v)
     cls.save()
+
+def set_runoff(candidateids, raceid):
+    """
+    Handles setting runoffs. Sets a race to called and
+    a list of candidates as participating in the runoff
+    and other candidates as not in the runoff. If
+    candidateids is null, will reset the race to be uncalled
+    and remove everyone from runoff status.
+    """
+    import models
+    if candidateids:
+        r = models.OverrideRace.update(nyt_called=True).where(
+            models.OverrideRace.race_unique_id==raceid
+        )
+        nc = models.OverrideCandidate\
+                .update(nyt_runoff=False)\
+                .where(
+                    ~(models.OverrideCandidate.candidate_unique_id << candidateids),
+                    models.OverrideCandidate.raceid==raceid.split('-')[1]
+                )
+        yc = models.OverrideCandidate\
+                .update(nyt_runoff=True)\
+                .where(
+                    models.OverrideCandidate.candidate_unique_id << candidateids,
+                    models.OverrideCandidate.raceid==raceid.split('-')[1]
+                )
+
+        r.execute()
+        nc.execute()
+        yc.execute()
+    else:
+        r = models.OverrideRace.update(nyt_called=False).where(
+            models.OverrideRace.race_unique_id==raceid
+        )
+        nc = models.OverrideCandidate\
+                .update(nyt_runoff=False)\
+                .where(models.OverrideCandidate.raceid==raceid.split('-')[1])
+        r.execute()
+        nc.execute()
 
 def set_winner(candidateid, raceid):
     """
