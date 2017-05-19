@@ -7,7 +7,7 @@
 ```
 git clone git@github.com:newsdev/elex-admin.git && cd elex-admin
 mkvirtualenv elex-admin
-pip install -r requirements.txt
+pip install -r py3.requirements.txt
 ```
 ## Add a new racedate to the admin
 * Duplicate the most recent racedate.ini file in `elex_admin/`. Name it with your new racedate.
