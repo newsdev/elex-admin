@@ -19,6 +19,7 @@ workon elex-admin
 fab e:stg master pull
 fab e:prd master pull
 ```
+You'll then want to go run the [elex-dotfiles commands](https://github.com/newsdev/elex-dotfiles#setting-up-a-server-for-a-new-election-night) to turn on the new racedate in the admin.
 
 ## Running the admin
 * This project requires [Adcom](https://github.com/newsdev/adcom) for its theme. You can deploy Adcom to a CDN like Amazon S3 and then specify the root of the URL in an environment variable.
